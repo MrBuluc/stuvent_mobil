@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stuventmobil/ui/QrCode/generate.dart';
-import 'package:stuventmobil/ui/QrCode/qr_code_page.dart';
+import 'package:stuventmobil/ui/Generate_Event/GeneratEvent.dart';
 import 'package:stuventmobil/ui/QrCode/scan.dart';
 import 'ui/homepage/home_page.dart';
 
@@ -15,9 +14,8 @@ class MyApp extends StatelessWidget {
       initialRoute: "/",
       routes: {
         "/": (context) => HomePage(),
-        "/qrcodepage": (context) => QrCodePage(),
         "/scan" : (context) => ScanScreen(),
-        "/generatescreen" : (context) => GenerateScreen(),
+        "/generatevent": (context) => GeneratEvent(),
       },
       onUnknownRoute: (RouteSettings settings) => MaterialPageRoute(
         builder: (context) => HomePage(),

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:barcode_scan/barcode_scan.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -10,7 +11,9 @@ class ScanScreen extends StatefulWidget {
 }
 
 class _ScanState extends State<ScanScreen> {
+  final Firestore _firestore = Firestore.instance;
   String barcode = "";
+  String result;
 
   String _scanBarcode = "";
 
@@ -39,6 +42,29 @@ class _ScanState extends State<ScanScreen> {
         barcode = "Unknown Error $ex";
       });
     }
+
+    setState(() {
+      result = "Yoklama alınıyor...";
+    });
+
+    final DocumentReference eventRef =
+    _firestore.document("Etkinlikler/$barcode");
+
+    _firestore.runTransaction((Transaction transaction) async {
+      DocumentSnapshot eventData = await eventRef.get();
+      List katilimcilar = eventData.data["Katılımcılar"];
+      katilimcilar.add("Hakkıcan Bülüç");
+      await transaction.update(eventRef, {"Katılımcılar": katilimcilar}).then(
+              (onValue) {
+                setState(() {
+                  result = "Yoklama alındı";
+                });
+              }).catchError((onError) {
+                setState(() {
+                  result = "Yoklama alınırken sorun oluştu";
+                });
+      });
+    });
   }
 
   @override
@@ -50,7 +76,7 @@ class _ScanState extends State<ScanScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: new AppBar(
-          title: new Text('QR Code Scanner'),
+          title: new Text('Yoklama'),
         ),
         body: new Center(
           child: new Column(
@@ -70,7 +96,7 @@ class _ScanState extends State<ScanScreen> {
               ,
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Text(barcode, textAlign: TextAlign.center,),
+                child: Text(result, textAlign: TextAlign.center,),
               )
               ,
             ],

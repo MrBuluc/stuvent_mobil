@@ -182,11 +182,5 @@ class _GeneratEventState extends State<GeneratEvent> {
     setState(() {
       _secilenResim = resim;
     });
-
-    /*if(url != null){
-      setState(() {
-        result = "Url alındı";
-      });
-    }*/
   }
 }
