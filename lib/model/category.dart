@@ -15,34 +15,41 @@ final allCategory = Category(
   icon: Icons.search,
 );
 
-final musicCategory = Category(
+final CSCategory = Category(
   categoryId: 1,
-  name: "Müzik",
-  icon: Icons.music_note,
+  name: "Computer Society",
+  icon: Icons.computer,
 );
 
-final meetUpCategory = Category(
+final EACategory = Category(
   categoryId: 2,
-  name: "Buluşma",
-  icon: Icons.location_on,
+  name: "Educational Activities",
+  icon: Icons.school,
 );
 
-final golfCategory = Category(
+final PESCategory = Category(
   categoryId: 3,
-  name: "Sinema",
-  icon: Icons.local_movies,
+  name: "Power and Energy",
+  icon: Icons.battery_charging_full,
 );
 
-final birthdayCategory = Category(
+final RASCategory = Category(
   categoryId: 4,
-  name: "Doğum Günü",
-  icon: Icons.cake,
+  name: "Robotics & Automation",
+  icon: Icons.android,
+);
+
+final WIECategory = Category(
+  categoryId: 4,
+  name: "Women in Engineering",
+  icon: Icons.local_florist,
 );
 
 final categories = [
   allCategory,
-  musicCategory,
-  meetUpCategory,
-  golfCategory,
-  birthdayCategory,
+  CSCategory,
+  EACategory,
+  PESCategory,
+  RASCategory,
+  WIECategory,
 ];

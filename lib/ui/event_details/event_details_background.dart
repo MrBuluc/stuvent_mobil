@@ -13,8 +13,8 @@ class EventDetailsBackground extends StatelessWidget {
       alignment: Alignment.topCenter,
       child: ClipPath(
         clipper: ImageClipper(),
-        child: Image.asset(
-          event.imagePath,
+        child: Image.network(
+          event.imageURL,
           fit: BoxFit.cover,
           width: screenWidth,
           color: Color(0x99000000),

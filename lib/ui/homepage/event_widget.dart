@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:stuventmobil/styleguide.dart';
 import '../../model/event.dart';
 
-class EventWidget extends StatelessWidget {
+class EventWidget extends StatefulWidget {
   final Event event;
-
   const EventWidget({Key key, this.event}) : super(key: key);
 
+  @override
+  _EventWidgetState createState() => _EventWidgetState();
+}
+
+class _EventWidgetState extends State<EventWidget> {
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -25,8 +29,8 @@ class EventWidget extends StatelessWidget {
               borderRadius: BorderRadius.all(
                 Radius.circular(30.0),
               ),
-              child: Image.asset(
-                event.imagePath,
+              child: Image.network(
+                widget.event.imageURL,
                 height: 150.0,
                 fit: BoxFit.fitWidth,
               ),
@@ -41,7 +45,7 @@ class EventWidget extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          event.title,
+                          widget.event.title,
                           style: eventTitleTextStyle,
                         ),
                         SizedBox(
@@ -55,7 +59,7 @@ class EventWidget extends StatelessWidget {
                                 width: 5.0,
                               ),
                               Text(
-                                event.location,
+                                widget.event.location,
                                 style: eventLocationTextStyle,
                               ),
                             ],
@@ -67,7 +71,7 @@ class EventWidget extends StatelessWidget {
                   Expanded(
                     flex: 1,
                     child: Text(
-                      event.duration.toUpperCase(),
+                      widget.event.date.toString(),
                       textAlign: TextAlign.right,
                       style: eventLocationTextStyle.copyWith(
                           fontWeight: FontWeight.w900),

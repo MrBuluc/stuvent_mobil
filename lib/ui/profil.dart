@@ -25,7 +25,7 @@ class _ProfilState extends State<Profil> {
   final formKey = GlobalKey<FormState>();
   TextEditingController ctrl;
 
-  String name, mail, mailYeni, password;
+  String name = "", mail = "", mailYeni, password;
   String result = "";
   bool superU = false;
   bool otomatikKontrol = false;

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:stuventmobil/ui/Login/new_User.dart';
-import 'package:stuventmobil/ui/homepage/home_page_super.dart';
+import 'package:stuventmobil/ui/homepage/home_page.dart';
 import 'dart:io';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -145,7 +145,7 @@ class _LoginState extends State<Login> {
           .signInWithEmailAndPassword(email: mail, password: password)
           .then((u) {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => HomePageSuper(u.user.uid)));
+            context, MaterialPageRoute(builder: (context) => HomePage(u.user.uid)));
       }).catchError((e) {
         setState(() {
           result = "Kayıtlı Kullanıcı bulunamamaktadır";
@@ -157,13 +157,14 @@ class _LoginState extends State<Login> {
           .then((u) {
         file.writeAsString("$mail-$password");
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => HomePageSuper(u.user.uid)));
+            context, MaterialPageRoute(builder: (context) => HomePage(u.user.uid)));
       }).catchError((e) {
         setState(() {
           result = "E-mail veya şifre hatalı\n";
           result += "Veya bu hesap bilgileri ile Google ile giriş yapmışsınız\n";
           result += "Google ile Giriş butonunu kullanınız\n";
-          result += "Veya İnternet Bağlantınızı kontrol edin";
+          result += "Veya İnternet Bağlantınızı kontrol edin\n";
+          result += "Veya Bu E-mail ve Şifre ile kayıtlı Kullanıcı bulunamamaktadır";
         });
       });
     }
@@ -193,7 +194,18 @@ class _LoginState extends State<Login> {
       }
     } catch (e) {
       setState(() {
-        result = "Bu telefona kayıtlı User bulunamamıştır";
+        result = "Bu telefona kayıtlı User bulunamamıştır\n";
+        result += "Şifre sıfırlama E-mail ı gönderiliyor...\n";
+      });
+
+      _auth.sendPasswordResetEmail(email: mail).then((v) {
+        setState(() {
+          result += "Şifre sıfırlama E-mail ı gönderildi";
+        });
+      }).catchError((e) {
+        setState(() {
+          result += "Şifremi unuttum mailinde hata";
+        });
       });
     }
   }
@@ -225,7 +237,7 @@ class _LoginState extends State<Login> {
             });
           });
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => HomePageSuper(user.user.uid)));
+              MaterialPageRoute(builder: (context) => HomePage(user.user.uid)));
         }).catchError((hata) {
           setState(() {
             result = "Firebase ve google kullanıcı hatası";

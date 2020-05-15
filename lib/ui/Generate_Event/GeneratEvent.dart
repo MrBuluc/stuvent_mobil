@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +11,7 @@ class GeneratEvent extends StatefulWidget {
 }
 
 class _GeneratEventState extends State<GeneratEvent> {
-  String event_name, location, url;
+  String event_name, location, url, category;
   String result = "";
   final formKey = GlobalKey<FormState>();
   final Firestore _firestore = Firestore.instance;
@@ -80,6 +79,82 @@ class _GeneratEventState extends State<GeneratEvent> {
                   SizedBox(
                     height: 10,
                   ),
+                  DropdownButton<String>(
+                    items: [
+                      DropdownMenuItem<String>(
+                        child: Row(
+                          children: <Widget>[
+                            Container(
+                              width: 24,
+                              height: 24,
+                              margin: EdgeInsets.only(right: 10),
+                            ),
+                            Text("CS"),
+                          ],
+                        ),
+                        value: "CS",
+                      ),
+                      DropdownMenuItem<String>(
+                        child: Row(
+                          children: <Widget>[
+                            Container(
+                              width: 24,
+                              height: 24,
+                              margin: EdgeInsets.only(right: 10),
+                            ),
+                            Text("EA"),
+                          ],
+                        ),
+                        value: "EA",
+                      ),
+                      DropdownMenuItem<String>(
+                        child: Row(
+                          children: <Widget>[
+                            Container(
+                              width: 24,
+                              height: 24,
+                              margin: EdgeInsets.only(right: 10),
+                            ),
+                            Text("PES"),
+                          ],
+                        ),
+                        value: "PES",
+                      ),
+                      DropdownMenuItem<String>(
+                        child: Row(
+                          children: <Widget>[
+                            Container(
+                              width: 24,
+                              height: 24,
+                              margin: EdgeInsets.only(right: 10),
+                            ),
+                            Text("RAS"),
+                          ],
+                        ),
+                        value: "RAS",
+                      ),
+                      DropdownMenuItem<String>(
+                        child: Row(
+                          children: <Widget>[
+                            Container(
+                              width: 24,
+                              height: 24,
+                              margin: EdgeInsets.only(right: 10),
+                            ),
+                            Text("WIE"),
+                          ],
+                        ),
+                        value: "WIE",
+                      ),
+                    ],
+                    onChanged: (String secilen) {
+                      setState(() {
+                        category = secilen;
+                      });
+                    },
+                    hint: Text("Komunite Seçiniz"),
+                    value: category,
+                  ),
                   RaisedButton(
                     child: Text("Tarih Seç"),
                     color: Colors.green,
@@ -141,16 +216,22 @@ class _GeneratEventState extends State<GeneratEvent> {
 
   _veriEkle() async {
     setState(() {
-        result = "Etkinlik oluşturuluyor...";
+      result = "Etkinlik oluşturuluyor...";
     });
 
     StorageReference ref = FirebaseStorage.instance
-       .ref()
-       .child("Etkinlikler")
-       .child(event_name)
-       .child("event_photo.png");
+        .ref()
+        .child("Etkinlikler")
+        .child(event_name)
+        .child("event_photo.png");
     StorageUploadTask uploadTask = ref.putFile(_secilenResim);
     url = await (await uploadTask.onComplete).ref.getDownloadURL();
+
+    QuerySnapshot querySnapshot =
+    await _firestore.collection("Etkinlikler").getDocuments();
+
+    Map map = querySnapshot.documents.asMap();
+    int len = map.length;
 
     List Katilimcilar = ["0"];
 
@@ -160,11 +241,12 @@ class _GeneratEventState extends State<GeneratEvent> {
     data["Etkinlik Konumu"] = location;
     data["Etkinlik Tarihi"] = tamTarih;
     data["Etkinlik Photo Url"] = url;
+    data["category"] = category;
     data["Katilimcilar"] = Katilimcilar;
 
     _firestore
         .collection("Etkinlikler")
-        .document(event_name)
+        .document(len.toString())
         .setData(data)
         .then((v) {
       setState(() {
@@ -177,7 +259,7 @@ class _GeneratEventState extends State<GeneratEvent> {
     });
   }
 
-  _galeriResimUpload() async{
+  _galeriResimUpload() async {
     var resim = await ImagePicker.pickImage(source: ImageSource.gallery);
     setState(() {
       _secilenResim = resim;

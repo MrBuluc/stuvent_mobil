@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:stuventmobil/ui/QrCode/generate.dart';
+import 'package:stuventmobil/ui/QrCode/scan.dart';
 import '../../model/guest.dart';
 import '../../styleguide.dart';
 import '../../model/event.dart';
@@ -88,7 +90,7 @@ class EventDetailsContent extends StatelessWidget {
               ],
             ),
           ),
-          Padding(
+          /*Padding(
             padding: const EdgeInsets.all(16.0),
             child: RichText(
               text: TextSpan(children: [
@@ -96,8 +98,8 @@ class EventDetailsContent extends StatelessWidget {
                 TextSpan(text: event.punchLine2, style: punchLine2TextStyle),
               ]),
             ),
-          ),
-          if (event.description.isNotEmpty)
+          ),*/
+          /*if (event.description.isNotEmpty)
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
@@ -134,9 +136,42 @@ class EventDetailsContent extends StatelessWidget {
                   )
               ],
             ),
+          ),*/
+          Row(
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                child: RaisedButton(
+                    color: Color(0xFFFF4700),
+                    textColor: Colors.white,
+                    splashColor: Colors.blueGrey,
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ScanScreen()),
+                      );
+                    },
+                    child: const Text('Yoklama al')),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                child: RaisedButton(
+                  color: Color(0xFFFF4700),
+                  textColor: Colors.white,
+                  splashColor: Colors.blueGrey,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => GenerateScreen(event.title)),
+                    );
+                  },
+                  child:  const Text('QR oluştur')),
+                ),
+            ]
+              )
+            ],
           ),
-        ],
-      ),
-    );
+      );
   }
 }
