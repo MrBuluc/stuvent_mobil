@@ -24,7 +24,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final Firestore _firestore = Firestore.instance;
 
-  String ad,konum,url,category;
+  String ad, konum, url, category;
   Timestamp date;
 
   @override
@@ -33,6 +33,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     read();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,11 +63,12 @@ class _HomePageState extends State<HomePage> {
                               Icons.person,
                               color: Color(0x99FFFFFF),
                             ),
-                            tooltip: "Profil",
+                            tooltip: "Profil Ayarları",
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => Profil(widget.uID)),
+                                MaterialPageRoute(
+                                    builder: (context) => Profil(widget.uID)),
                               );
                             },
                           )
@@ -129,24 +131,22 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> read() async {
-    final events = [
-    ];
+    final events = [];
     events.add("0");
     QuerySnapshot querySnapshot =
         await _firestore.collection("Etkinlikler").getDocuments();
 
     Map map = querySnapshot.documents.asMap();
     int len = map.length;
-    for(int i = 0; i<len;  i++){
+    for (int i = 0; i < len; i++) {
       DocumentSnapshot documentSnapshot =
-      await _firestore.document("Etkinlikler/$i").get();
+          await _firestore.document("Etkinlikler/$i").get();
       setState(() {
         ad = documentSnapshot.data["Etkinlik Adı"];
         konum = documentSnapshot.data["Etkinlik Konumu"];
         url = documentSnapshot.data["Etkinlik Photo Url"];
         date = documentSnapshot.data["Etkinlik Tarihi"];
         category = documentSnapshot.data["category"];
-
       });
       debugPrint("Ad: $ad");
       debugPrint("Konum: $konum");

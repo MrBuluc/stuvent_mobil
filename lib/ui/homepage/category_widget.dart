@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stuventmobil/styleguide.dart';
@@ -46,6 +47,7 @@ class CategoryWidget extends StatelessWidget {
             Text(
               category.name,
               style: isSelected ? selectedCategoryTextStyle : categoryTextStyle,
+              textAlign: TextAlign.center,
             ),
           ],
         ),

@@ -40,7 +40,7 @@ final RASCategory = Category(
 );
 
 final WIECategory = Category(
-  categoryId: 4,
+  categoryId: 5,
   name: "Women in Engineering",
   icon: Icons.local_florist,
 );
