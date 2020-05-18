@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "878073458649",
+    "firebase_url": "https://stuvent-mobil.firebaseio.com",
+    "project_id": "stuvent-mobil",
+    "storage_bucket": "stuvent-mobil.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:878073458649:android:a268188f50cd671a4373c8",
+        "android_client_info": {
+          "package_name": "github.io.emirxmertoglu.stuventmobil"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "878073458649-nt5hdohqkrs9lue5leh704qticbokp7q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "github.io.emirxmertoglu.stuventmobil",
+            "certificate_hash": "91b33205e5abb74034dfbd50df81d8a61fcca780"
+          }
+        },
+        {
+          "client_id": "878073458649-l58fu0ad09ositi5mkgshqm3ruh3jvv1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3gCqduBFalgboyGTtuNxpgh6raYuPncs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "878073458649-l58fu0ad09ositi5mkgshqm3ruh3jvv1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
