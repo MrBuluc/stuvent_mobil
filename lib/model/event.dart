@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Event{
+class Event {
   final String title, location, imageURL;
   final Timestamp date;
   final List categoryIds;
@@ -16,7 +16,10 @@ final Firestore _firestore = Firestore.instance;
 String ad, konum, url;
 List categoryList;
 Timestamp date;
+
 Future<void> read() async {
+  events.clear();
+
   QuerySnapshot querySnapshot =
       await _firestore.collection("Etkinlikler").getDocuments();
 

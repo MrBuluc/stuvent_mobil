@@ -46,6 +46,7 @@ class CategoryWidget extends StatelessWidget {
             Text(
               category.name,
               style: isSelected ? selectedCategoryTextStyle : categoryTextStyle,
+              textAlign: TextAlign.center,
             ),
           ],
         ),

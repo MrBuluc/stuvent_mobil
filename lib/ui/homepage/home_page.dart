@@ -43,7 +43,7 @@ class _HomePageState extends State<HomePage> {
                       child: Row(
                         children: <Widget>[
                           Text(
-                            "ETKİNLİK HABERCİSİ",
+                            "STUVENT ETKİNLİK HABERCİSİ",
                             style: fadedTextStyle,
                           ),
                           Spacer(),
@@ -67,13 +67,16 @@ class _HomePageState extends State<HomePage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 32.0),
                       child: Text(
-                        "IEEE MSKU 🔋",
+                        "Çevrendeki Etkinliklere Gözat 🥳",
                         style: whiteHeadingTextStyle,
+                        textAlign: TextAlign.center,
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 24.0),
-                      child: SingleChildScrollView(
+                      child: Consumer<AppState>(
+                        builder: (context, appState, _) =>
+                            SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children: <Widget>[
@@ -82,6 +85,7 @@ class _HomePageState extends State<HomePage> {
                             ],
                           ),
                         ),
+                      ),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -89,7 +93,9 @@ class _HomePageState extends State<HomePage> {
                         future: read(),
                         builder: (context, sonuc) => Column(
                           children: <Widget>[
-                            for (final event in events)
+                            for (final event in events.where((e) => e
+                                .categoryIds
+                                .contains(appState.selectedCategoryId)))
                               GestureDetector(
                                 onTap: () {
                                   Navigator.of(context).push(MaterialPageRoute(
@@ -103,7 +109,7 @@ class _HomePageState extends State<HomePage> {
                               )
                           ],
                         ),
-                    ),
+                      ),
                     ),
                   ],
                 ),

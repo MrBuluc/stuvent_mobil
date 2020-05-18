@@ -7,7 +7,7 @@ final TextStyle fadedTextStyle = TextStyle(
 );
 
 final TextStyle whiteHeadingTextStyle = TextStyle(
-  fontSize: 40.0,
+  fontSize: 30.0,
   fontWeight: FontWeight.bold,
   color: Color(0xFFFFFFFF),
 );
