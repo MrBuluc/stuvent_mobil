@@ -29,8 +29,9 @@ class _EventWidgetState extends State<EventWidget> {
               borderRadius: BorderRadius.all(
                 Radius.circular(30.0),
               ),
-              child: Image.network(
-                widget.event.imageURL,
+              child: FadeInImage.assetNetwork(
+                placeholder: "assets/loading.gif",
+                image: widget.event.imageURL,
                 height: 150.0,
                 fit: BoxFit.fitWidth,
               ),

@@ -26,13 +26,17 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Theme(
-        data: Theme.of(context).copyWith(),
+        data: Theme.of(context).copyWith(
+            accentColor: Colors.green,
+            hintColor: Colors.indigo,
+            errorColor: Colors.red,
+            primaryColor: Colors.teal),
         child: Scaffold(
           floatingActionButton: FloatingActionButton(
             onPressed: () {
               _emailvesifreileGirisYap();
             },
-            backgroundColor: Color(0xFFFF4700),
+            backgroundColor: Colors.teal,
             child: Icon(Icons.arrow_forward),
           ),
           appBar: AppBar(
@@ -140,8 +144,8 @@ class _LoginState extends State<Login> {
       _auth
           .signInWithEmailAndPassword(email: mail, password: password)
           .then((u) {
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => HomePage(u.user.uid)));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => HomePage(u.user.uid)));
       }).catchError((e) {
         setState(() {
           result = "Kayıtlı Kullanıcı bulunamamaktadır";
@@ -152,17 +156,15 @@ class _LoginState extends State<Login> {
           .signInWithEmailAndPassword(email: mail, password: password)
           .then((u) {
         file.writeAsString("$mail-$password");
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => HomePage(u.user.uid)));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => HomePage(u.user.uid)));
       }).catchError((e) {
         setState(() {
           result = "E-mail veya şifre hatalı\n";
-          result +=
-              "Veya bu hesap bilgileri ile Google ile giriş yapmışsınız\n";
+          result += "Veya bu hesap bilgileri ile Google ile giriş yapmışsınız\n";
           result += "Google ile Giriş butonunu kullanınız\n";
           result += "Veya İnternet Bağlantınızı kontrol edin\n";
-          result +=
-              "Veya Bu E-mail ve Şifre ile kayıtlı Kullanıcı bulunamamaktadır";
+          result += "Veya Bu E-mail ve Şifre ile kayıtlı Kullanıcı bulunamamaktadır";
         });
       });
     }
@@ -248,8 +250,7 @@ class _LoginState extends State<Login> {
       });
     }).catchError((hata) {
       setState(() {
-        result =
-            "Google ile Girişde hata veya İnternet Bağlantınızı kontrol edin";
+        result = "Google ile Girişde hata veya İnternet Bağlantınızı kontrol edin";
       });
     });
   }

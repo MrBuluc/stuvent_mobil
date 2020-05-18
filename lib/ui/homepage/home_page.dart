@@ -8,7 +8,6 @@ import 'package:stuventmobil/ui/homepage/event_widget.dart';
 import 'package:stuventmobil/ui/homepage/home_page_background.dart';
 import 'package:stuventmobil/app_state.dart';
 import 'package:stuventmobil/ui/profil.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'category_widget.dart';
 
@@ -22,17 +21,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final Firestore _firestore = Firestore.instance;
-
-  String ad, konum, url, category;
-  Timestamp date;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    read();
-  }
+  AppState appState;
 
   @override
   Widget build(BuildContext context) {
@@ -78,15 +67,13 @@ class _HomePageState extends State<HomePage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 32.0),
                       child: Text(
-                        "Stuvent 😏😏",
+                        "IEEE MSKU 🔋",
                         style: whiteHeadingTextStyle,
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 24.0),
-                      child: Consumer<AppState>(
-                        builder: (context, appState, _) =>
-                            SingleChildScrollView(
+                      child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children: <Widget>[
@@ -95,16 +82,14 @@ class _HomePageState extends State<HomePage> {
                             ],
                           ),
                         ),
-                      ),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Consumer<AppState>(
-                        builder: (context, appState, _) => Column(
+                      child: FutureBuilder<void>(
+                        future: read(),
+                        builder: (context, sonuc) => Column(
                           children: <Widget>[
-                            for (final event in events.where((e) => e
-                                .categoryIds
-                                .contains(appState.selectedCategoryId)))
+                            for (final event in events)
                               GestureDetector(
                                 onTap: () {
                                   Navigator.of(context).push(MaterialPageRoute(
@@ -118,7 +103,7 @@ class _HomePageState extends State<HomePage> {
                               )
                           ],
                         ),
-                      ),
+                    ),
                     ),
                   ],
                 ),
@@ -128,31 +113,5 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
-  }
-
-  Future<void> read() async {
-    final events = [];
-    events.add("0");
-    QuerySnapshot querySnapshot =
-        await _firestore.collection("Etkinlikler").getDocuments();
-
-    Map map = querySnapshot.documents.asMap();
-    int len = map.length;
-    for (int i = 0; i < len; i++) {
-      DocumentSnapshot documentSnapshot =
-          await _firestore.document("Etkinlikler/$i").get();
-      setState(() {
-        ad = documentSnapshot.data["Etkinlik Adı"];
-        konum = documentSnapshot.data["Etkinlik Konumu"];
-        url = documentSnapshot.data["Etkinlik Photo Url"];
-        date = documentSnapshot.data["Etkinlik Tarihi"];
-        category = documentSnapshot.data["category"];
-      });
-      debugPrint("Ad: $ad");
-      debugPrint("Konum: $konum");
-      debugPrint("URL: $url");
-      debugPrint("Tarih: ${date.toDate()}");
-      debugPrint("Category: $category");
-    }
   }
 }

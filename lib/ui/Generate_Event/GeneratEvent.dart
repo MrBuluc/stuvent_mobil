@@ -232,8 +232,10 @@ class _GeneratEventState extends State<GeneratEvent> {
 
     Map map = querySnapshot.documents.asMap();
     int len = map.length;
-
     List Katilimcilar = ["0"];
+
+    List categoryList = [0];
+    categoryList.add(category);
 
     formKey.currentState.save();
     Map<String, dynamic> data = Map();
@@ -241,7 +243,7 @@ class _GeneratEventState extends State<GeneratEvent> {
     data["Etkinlik Konumu"] = location;
     data["Etkinlik Tarihi"] = tamTarih;
     data["Etkinlik Photo Url"] = url;
-    data["category"] = category;
+    data["category"] = categoryList;
     data["Katilimcilar"] = Katilimcilar;
 
     _firestore
