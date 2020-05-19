@@ -221,11 +221,14 @@ class _LoginState extends State<Login> {
             idToken: googleKeys.idToken, accessToken: googleKeys.accessToken);
 
         _auth.signInWithCredential(credential).then((user) {
+          List etkinlikler = ["0"];
+
           Map<String, dynamic> data = Map();
           data["Ad"] = user.user.displayName;
           data["E-mail"] = user.user.email;
           data["UserID"] = user.user.uid;
           data["SuperUser"] = false;
+          data["Etkinlikler"] = etkinlikler;
 
           _firestore
               .collection("Users")

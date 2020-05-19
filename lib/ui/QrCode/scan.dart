@@ -6,6 +6,10 @@ import 'package:flutter/services.dart';
 
 
 class ScanScreen extends StatefulWidget {
+  String uId;
+
+  ScanScreen(this.uId);
+
   @override
   _ScanState createState() => new _ScanState();
 }
@@ -14,8 +18,6 @@ class _ScanState extends State<ScanScreen> {
   final Firestore _firestore = Firestore.instance;
   String barcode = "";
   String result = "";
-
-  String _scanBarcode = "";
 
   Future _scanQR() async {
     try {
@@ -48,13 +50,14 @@ class _ScanState extends State<ScanScreen> {
     });
 
     final DocumentReference eventRef =
-    _firestore.document("Users/Hakkıcan Bülüç");
+    _firestore.document("Users/${widget.uId}");
 
+    List etkinlik;
     _firestore.runTransaction((Transaction transaction) async {
       DocumentSnapshot eventData = await eventRef.get();
-      List etkinlikler = eventData.data["Etkinlikler"];
-      etkinlikler.add(barcode);
-      await transaction.update(eventRef, {"Etkinlikler": etkinlikler}).then(
+      etkinlik = eventData.data["Etkinlikler"];
+      etkinlik.add(barcode);
+      await transaction.update(eventRef, {"Etkinlikler": etkinlik}).then(
               (onValue) {
             setState(() {
               result = "Yoklama alındı";

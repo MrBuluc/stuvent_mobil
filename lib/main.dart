@@ -19,8 +19,6 @@ class _MyAppState extends State<MyApp> {
       initialRoute: "/",
       routes: {
         "/": (context) => Login(),
-        "/scan": (context) => ScanScreen(),
-        "/generatevent": (context) => GeneratEvent(),
       },
       onUnknownRoute: (RouteSettings settings) => MaterialPageRoute(
         builder: (context) => Login(),

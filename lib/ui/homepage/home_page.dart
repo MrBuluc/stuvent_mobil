@@ -21,8 +21,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  AppState appState;
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    events.clear();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,7 +72,7 @@ class _HomePageState extends State<HomePage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 32.0),
                       child: Text(
-                        "Çevrendeki Etkinliklere Gözat 🥳",
+                        "Çevrendeki Etkinliklere Gözat 🔋",
                         style: whiteHeadingTextStyle,
                         textAlign: TextAlign.center,
                       ),
@@ -91,23 +96,24 @@ class _HomePageState extends State<HomePage> {
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: FutureBuilder<void>(
                         future: read(),
-                        builder: (context, sonuc) => Column(
-                          children: <Widget>[
-                            for (final event in events.where((e) => e
-                                .categoryIds
-                                .contains(appState.selectedCategoryId)))
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        EventDetailsPage(event: event),
-                                  ));
-                                },
-                                child: EventWidget(
-                                  event: event,
-                                ),
-                              )
-                          ],
+                        builder: (context, sonuc) => Consumer<AppState>(
+                          builder: (context, appState, _) => Column(
+                            children: <Widget>[
+                              for (final event in events)
+                                if(event.categoryIds.contains(appState.selectedCategoryId))
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).push(MaterialPageRoute(
+                                        builder: (context) =>
+                                            EventDetailsPage(event: event, uId: widget.uID,),
+                                      ));
+                                    },
+                                    child: EventWidget(
+                                      event: event,
+                                    ),
+                                  )
+                            ],
+                          ),
                         ),
                       ),
                     ),

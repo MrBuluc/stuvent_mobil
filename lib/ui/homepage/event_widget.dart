@@ -3,7 +3,7 @@ import 'package:stuventmobil/styleguide.dart';
 import '../../model/event.dart';
 
 class EventWidget extends StatefulWidget {
-  final Event event;
+  final  Event event;
   const EventWidget({Key key, this.event}) : super(key: key);
 
   @override
@@ -29,11 +29,14 @@ class _EventWidgetState extends State<EventWidget> {
               borderRadius: BorderRadius.all(
                 Radius.circular(30.0),
               ),
-              child: FadeInImage.assetNetwork(
-                placeholder: "assets/loading.gif",
-                image: widget.event.imageURL,
-                height: 150.0,
-                fit: BoxFit.fitWidth,
+              child: Hero(
+                tag: widget.event.title,
+                child: FadeInImage.assetNetwork(
+                  placeholder: "assets/loading.gif",
+                  image: widget.event.imageURL,
+                  height: 150.0,
+                  fit: BoxFit.fitWidth,
+                ),
               ),
             ),
             Padding(
@@ -72,7 +75,7 @@ class _EventWidgetState extends State<EventWidget> {
                   Expanded(
                     flex: 1,
                     child: Text(
-                      widget.event.date.toString(),
+                      "",
                       textAlign: TextAlign.right,
                       style: eventLocationTextStyle.copyWith(
                           fontWeight: FontWeight.w900),

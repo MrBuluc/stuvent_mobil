@@ -125,11 +125,14 @@ class _NewUserState extends State<NewUser> {
         });
       });
 
+      List etkinlikler = ["0"];
+
       Map<String, dynamic> data = Map();
       data["Ad"] = name;
       data["E-mail"] = mail;
       data["UserID"] = firebaseUser.user.uid;
       data["SuperUser"] = false;
+      data["Etkinlikler"] = etkinlikler;
 
       _firestore
           .collection("Users")
