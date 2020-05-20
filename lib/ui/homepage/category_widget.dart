@@ -11,6 +11,9 @@ class CategoryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
+
     final appState = Provider.of<AppState>(context);
     final isSelected = appState.selectedCategoryId == category.categoryId;
 
@@ -27,7 +30,7 @@ class CategoryWidget extends StatelessWidget {
         decoration: BoxDecoration(
           border: Border.all(
             color: isSelected ? Colors.white : Color(0x99FFFFFF),
-            width: 3.0,
+            width: 1.0,
           ),
           borderRadius: BorderRadius.all(Radius.circular(16.0)),
           color: isSelected ? Colors.white : Colors.transparent,

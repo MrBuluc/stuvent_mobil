@@ -13,7 +13,7 @@ class HomePageBackground extends StatelessWidget {
     return ClipPath(
       clipper: BottomShapeClipper(),
       child: Container(
-        height: screenHide * 0.5,
+        height: screenHide * 0.57,
         color: themeData.primaryColor,
       ),
     );
