@@ -170,7 +170,7 @@ class _ProfilState extends State<Profil> {
                     style: TextStyle(color: Colors.black,fontWeight: FontWeight.w800),
                   ),
                   onPressed: () {
-                    _cikisyap();
+                    userRepo.signOut();
                   },
                   color: Colors.red,
                 ),

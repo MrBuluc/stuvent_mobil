@@ -23,8 +23,7 @@ class _LoginState extends State<Login> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   String mail, password;
-  String result =
-      "Daha önce E-mail ve Şifre ile giriş yaptıysanız lütfen sağ alttaki butona basın";
+  String result = "";
   bool otomatikKontrol = false;
 
   @override
@@ -42,6 +41,9 @@ class _LoginState extends State<Login> {
             onPressed: () async {
               if (formKey.currentState.validate()) {
                 formKey.currentState.save();
+                setState(() {
+                  result = "Giriş Yapılıyor...";
+                });
                 if (!await userRepo.signIn(mail, password)) {
                   _scaffoldKey.currentState.showSnackBar(
                       SnackBar(content: Text("E-posta veya Şifre Hatalı")));
@@ -126,7 +128,7 @@ class _LoginState extends State<Login> {
                   child: Text("Google ile Giriş"),
                   color: Colors.red,
                   onPressed: () {
-                    _googleGiris();
+                    userRepo.gSignIn();
                   },
                 ),
                 SizedBox(

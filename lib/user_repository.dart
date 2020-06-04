@@ -1,21 +1,25 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-//import 'package:google_sign_in/google_sign_in.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-enum UserDurum {Idle, OturumAcilmamis, OturumAciliyor, OturumAcik}
+enum UserDurum { Idle, OturumAcilmamis, OturumAciliyor, OturumAcik }
 
-class UserRepository with ChangeNotifier{
+class UserRepository with ChangeNotifier {
   FirebaseAuth _auth;
   FirebaseUser _user;
   Firestore _firestore;
+  GoogleSignIn _googleAuth;
   UserDurum _durum = UserDurum.Idle;
   String uId;
 
-  UserRepository(){
+  UserRepository() {
     _auth = FirebaseAuth.instance;
     _auth.onAuthStateChanged.listen(_onAuthStateChanged);
     _firestore = Firestore.instance;
+    _googleAuth = GoogleSignIn();
   }
 
   UserDurum get durum => _durum;
@@ -31,33 +35,80 @@ class UserRepository with ChangeNotifier{
   }
 
   Future<bool> signIn(String email, String sifre) async {
-    try{
+    try {
       _durum = UserDurum.OturumAciliyor;
       notifyListeners();
-      await _auth.signInWithEmailAndPassword(email: email, password: sifre).then((u) {
+      await _auth
+          .signInWithEmailAndPassword(email: email, password: sifre)
+          .then((u) {
         _user = u.user;
         uId = _user.uid;
       });
       return true;
     } catch (e) {
-      debugPrint("Hata: "+ e.toString());
+      debugPrint("Hata: " + e.toString());
       _durum = UserDurum.OturumAcilmamis;
       notifyListeners();
       return false;
     }
   }
 
+  Future<void> gSignIn() {
+    try {
+      _durum = UserDurum.OturumAciliyor;
+      notifyListeners();
+      _googleAuth.signIn().then((sonuc) {
+        sonuc.authentication.then((googleKeys) {
+          AuthCredential credential = GoogleAuthProvider.getCredential(
+              idToken: googleKeys.idToken, accessToken: googleKeys.accessToken);
+
+          _auth.signInWithCredential(credential).then((user) {
+            List etkinlikler = ["0"];
+
+            Map<String, dynamic> data = Map();
+            data["Ad"] = user.user.displayName;
+            data["E-mail"] = user.user.email;
+            data["UserID"] = user.user.uid;
+            data["SuperUser"] = false;
+            data["Etkinlikler"] = etkinlikler;
+
+            _firestore
+                .collection("Users")
+                .document(user.user.uid)
+                .setData(data)
+                .catchError((onError) {
+              debugPrint(
+                  "Üye Database'e Kayıt edilirken sorun oluştu $onError");
+            });
+          }).catchError((hata) {
+            debugPrint("Firebase ve google kullanıcı hatası $hata");
+          });
+        }).catchError((hata) {
+          debugPrint("Google authentication hatası $hata");
+        });
+      }).catchError((hata) {
+        debugPrint(
+            "Google ile Girişde hata veya İnternet Bağlantınızı kontrol edin $hata");
+      });
+    } catch (e) {
+      debugPrint("Hata: " + e.toString());
+      _durum = UserDurum.OturumAcilmamis;
+      notifyListeners();
+    }
+  }
+
   Future signOut() async {
     _auth.signOut();
+    _googleAuth.signOut();
     durum = UserDurum.OturumAcilmamis;
     notifyListeners();
     return Future.delayed(Duration.zero);
   }
 
   Future<void> _onAuthStateChanged(FirebaseUser user) async {
-    if(user == null){
+    if (user == null) {
       _durum = UserDurum.OturumAcilmamis;
-    }else{
+    } else {
       _user = user;
       _durum = UserDurum.OturumAcik;
     }
