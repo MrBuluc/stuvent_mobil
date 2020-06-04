@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:stuventmobil/app/landing_page.dart';
 import 'package:stuventmobil/user_repository.dart';
-import 'ui/Login/login.dart';
 
 void main() => runApp(MyApp());
 
@@ -15,12 +15,14 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<UserRepository>(create: (context)=> UserRepository(),),
+        ChangeNotifierProvider<UserRepository>(
+          create: (context) => UserRepository(),
+        ),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: true,
-        home: Login(),
+        home: LandingPage(),
         theme: ThemeData(
           scaffoldBackgroundColor: Color(0xFFFFFFFF),
           primaryColor: Color(0xFFFF4700),

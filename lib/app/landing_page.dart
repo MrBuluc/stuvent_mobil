@@ -11,7 +11,7 @@ import 'package:stuventmobil/ui/Login/login.dart';
 class LandingPage extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
-    return Consumer(builder: (context, UserRepository userRepo, child) {
+    return Consumer(builder: (context, UserRepository userRepo, child){
       switch(userRepo.durum){
         case UserDurum.Idle:
           return SplashEkran();

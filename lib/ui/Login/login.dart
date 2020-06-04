@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:stuventmobil/ui/Login/new_User.dart';
 import 'package:stuventmobil/ui/homepage/home_page.dart';
 import 'dart:io';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:stuventmobil/user_repository.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -18,6 +20,7 @@ class _LoginState extends State<Login> {
   final Firestore _firestore = Firestore.instance;
 
   final formKey = GlobalKey<FormState>();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   String mail, password;
   String result =
@@ -26,6 +29,7 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
+    final userRepo = Provider.of<UserRepository>(context);
     return Theme(
         data: Theme.of(context).copyWith(
             accentColor: Colors.green,
@@ -33,9 +37,16 @@ class _LoginState extends State<Login> {
             errorColor: Colors.red,
             primaryColor: Colors.teal),
         child: Scaffold(
+          key: _scaffoldKey,
           floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              _emailvesifreileGirisYap();
+            onPressed: () async {
+              if (formKey.currentState.validate()) {
+                formKey.currentState.save();
+                if (!await userRepo.signIn(mail, password)) {
+                  _scaffoldKey.currentState.showSnackBar(
+                      SnackBar(content: Text("E-posta veya Şifre Hatalı")));
+                }
+              }
             },
             backgroundColor: Colors.teal,
             child: Icon(Icons.arrow_forward),
@@ -76,7 +87,7 @@ class _LoginState extends State<Login> {
                     border: OutlineInputBorder(),
                   ),
                   validator: (String value) {
-                    if(value.length < 6) {
+                    if (value.length < 6) {
                       return "En az 6 karakter gerekli";
                     }
                     return null;
@@ -133,57 +144,6 @@ class _LoginState extends State<Login> {
             ),
           ),
         ));
-  }
-
-  Future<void> _emailvesifreileGirisYap() async {
-    setState(() {
-      result = "Giriş yapılıyor...";
-    });
-
-    Directory directory = await getApplicationDocumentsDirectory();
-    String path = directory.path;
-    File file = File("$path/user.txt");
-    try {
-      String user = await file.readAsString();
-      var arr = user.split("-");
-      mail = arr[0];
-      password = arr[1];
-      _auth
-          .signInWithEmailAndPassword(email: mail, password: password)
-          .then((u) {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => HomePage()));
-      }).catchError((e) {
-        setState(() {
-          result = "Kayıtlı Kullanıcı bulunamamaktadır";
-        });
-      });
-    } catch (e) {
-      if(formKey.currentState.validate()){
-        formKey.currentState.save();
-        _auth
-            .signInWithEmailAndPassword(email: mail, password: password)
-            .then((u) {
-          file.writeAsString("$mail-$password");
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => HomePage()));
-        }).catchError((e) {
-          setState(() {
-            result = "E-mail veya şifre hatalı\n";
-            result += "Veya bu hesap bilgileri ile Google ile giriş yapmışsınız\n";
-            result += "Google ile Giriş butonunu kullanınız\n";
-            result += "Veya İnternet Bağlantınızı kontrol edin\n";
-            result += "Veya Bu E-mail ve Şifre ile kayıtlı Kullanıcı bulunamamaktadır";
-          });
-        });
-      }
-      else{
-        setState(() {
-          otomatikKontrol = true;
-          result = "E-posta ve şifenizi doğru giriniz...";
-        });
-      }
-    }
   }
 
   Future<void> _sifremiUnuttum() async {
@@ -255,8 +215,8 @@ class _LoginState extends State<Login> {
               result = "Üye Database'e Kayıt edilirken sorun oluştu $onError";
             });
           });
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => HomePage()));
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => HomePage()));
         }).catchError((hata) {
           setState(() {
             result = "Firebase ve google kullanıcı hatası";
@@ -269,7 +229,8 @@ class _LoginState extends State<Login> {
       });
     }).catchError((hata) {
       setState(() {
-        result = "Google ile Girişde hata veya İnternet Bağlantınızı kontrol edin";
+        result =
+            "Google ile Girişde hata veya İnternet Bağlantınızı kontrol edin";
       });
     });
   }

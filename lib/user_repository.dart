@@ -40,6 +40,7 @@ class UserRepository with ChangeNotifier{
       });
       return true;
     } catch (e) {
+      debugPrint("Hata: "+ e.toString());
       _durum = UserDurum.OturumAcilmamis;
       notifyListeners();
       return false;
