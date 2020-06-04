@@ -4,12 +4,12 @@ import '../../model/event.dart';
 import 'package:stuventmobil/ui/QrCode/generate.dart';
 import 'package:stuventmobil/ui/QrCode/scan.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class EventDetailsPage extends StatefulWidget {
   final Event event;
-  final String uId;
 
-  const EventDetailsPage({Key key, this.event, this.uId}) : super(key: key);
+  const EventDetailsPage({Key key, this.event}) : super(key: key);
 
   @override
   _EventDetailsPageState createState() => _EventDetailsPageState();
@@ -17,6 +17,7 @@ class EventDetailsPage extends StatefulWidget {
 
 class _EventDetailsPageState extends State<EventDetailsPage> {
   final Firestore _firestore = Firestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   bool superU = false;
 
   @override
@@ -55,7 +56,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => ScanScreen(widget.uId)),
+                        MaterialPageRoute(builder: (context) => ScanScreen()),
                       );
                     },
                     child: const Text('Yoklama al')),
@@ -85,11 +86,14 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   }
 
   Future<void> superUser() async {
-    DocumentSnapshot documentSnapshot =
-        await _firestore.document("Users/${widget.uId}").get();
+    _auth.currentUser().then((user) async {
+      String uId = user.uid;
+      DocumentSnapshot documentSnapshot =
+          await _firestore.document("Users/${uId}").get();
 
-    setState(() {
-      superU = documentSnapshot.data["SuperUser"];
+      setState(() {
+        superU = documentSnapshot.data["SuperUser"];
+      });
     });
   }
 }

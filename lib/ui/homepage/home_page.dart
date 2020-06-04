@@ -12,10 +12,6 @@ import 'package:stuventmobil/ui/profil.dart';
 import 'category_widget.dart';
 
 class HomePage extends StatefulWidget {
-  String uID;
-
-  HomePage(this.uID);
-
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -30,7 +26,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    //double height = MediaQuery.of(context).size.height;
     double width = MediaQuery.of(context).size.width;
 
     return Scaffold(
@@ -67,7 +62,7 @@ class _HomePageState extends State<HomePage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => Profil(widget.uID)),
+                                      builder: (context) => Profil()),
                                 );
                               },
                             )
@@ -113,7 +108,6 @@ class _HomePageState extends State<HomePage> {
                                             .push(MaterialPageRoute(
                                           builder: (context) => EventDetailsPage(
                                             event: event,
-                                            uId: widget.uID,
                                           ),
                                         ));
                                       },

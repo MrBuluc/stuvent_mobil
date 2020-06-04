@@ -5,14 +5,12 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
 import 'package:stuventmobil/ui/Login/login.dart';
 import 'package:stuventmobil/ui/Generate_Event/GeneratEvent.dart';
+import 'package:stuventmobil/user_repository.dart';
 
 class Profil extends StatefulWidget {
-  String uID;
-
-  Profil(this.uID);
-
   @override
   _ProfilState createState() => _ProfilState();
 }
@@ -29,12 +27,13 @@ class _ProfilState extends State<Profil> {
   String result = "";
   bool superU = false;
   bool otomatikKontrol = false;
-  @override
+
+  /*@override
   void initState() {
     // TODO: implement initState
     super.initState();
     read();
-  }
+  }*/
 
   @override
   void dispose() {
@@ -45,6 +44,11 @@ class _ProfilState extends State<Profil> {
 
   @override
   Widget build(BuildContext context) {
+    final userRepo = Provider.of<UserRepository>(context);
+    userRepo.read().then(((map){
+      final userMap = map;
+      read(userMap);
+    }));
     return Theme(
       data: Theme.of(context).copyWith(
         accentColor: Colors.green,
@@ -189,14 +193,11 @@ class _ProfilState extends State<Profil> {
     );
   }
 
-  Future<void> read() async {
-    DocumentSnapshot documentSnapshot =
-        await _firestore.document("Users/${widget.uID}").get();
-
+  void read(Map uMap){
     setState(() {
-      name = documentSnapshot.data["Ad"];
-      mail = documentSnapshot.data["E-mail"];
-      superU = documentSnapshot.data["SuperUser"];
+      name = uMap["Ad"];
+      mail = uMap["E-mail"];
+      superU = uMap["SuperUser"];
       ctrl = TextEditingController.fromValue(TextEditingValue(text: mail));
     });
   }
@@ -276,10 +277,10 @@ class _ProfilState extends State<Profil> {
     if(formKey.currentState.validate()){
       formKey.currentState.save();
       _auth.currentUser().then((user) {
+        String uId = user.uid;
         user.updateEmail(mailYeni).then((a) async {
-          DocumentReference reference = _firestore.document("Users/${widget.uID}");
+          DocumentReference reference = _firestore.document("Users/$uId");
           _firestore.runTransaction((Transaction transaction) async {
-            //DocumentSnapshot data = await reference.get();
             await transaction.update(reference, {"E-mail": mailYeni});
           });
 

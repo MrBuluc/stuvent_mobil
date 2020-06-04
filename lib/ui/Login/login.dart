@@ -22,6 +22,7 @@ class _LoginState extends State<Login> {
   String mail, password;
   String result =
       "Daha önce E-mail ve Şifre ile giriş yaptıysanız lütfen sağ alttaki butona basın";
+  bool otomatikKontrol = false;
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +60,7 @@ class _LoginState extends State<Login> {
                     labelText: "E-posta adresiniz",
                     border: OutlineInputBorder(),
                   ),
+                  validator: _emailKontrol,
                   onSaved: (String value) => mail = value,
                 ),
                 SizedBox(
@@ -73,6 +75,12 @@ class _LoginState extends State<Login> {
                     labelText: "Şifreniz",
                     border: OutlineInputBorder(),
                   ),
+                  validator: (String value) {
+                    if(value.length < 6) {
+                      return "En az 6 karakter gerekli";
+                    }
+                    return null;
+                  },
                   onSaved: (String value) => password = value,
                 ),
                 SizedBox(
@@ -132,7 +140,6 @@ class _LoginState extends State<Login> {
       result = "Giriş yapılıyor...";
     });
 
-    formKey.currentState.save();
     Directory directory = await getApplicationDocumentsDirectory();
     String path = directory.path;
     File file = File("$path/user.txt");
@@ -145,28 +152,37 @@ class _LoginState extends State<Login> {
           .signInWithEmailAndPassword(email: mail, password: password)
           .then((u) {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => HomePage(u.user.uid)));
+            context, MaterialPageRoute(builder: (context) => HomePage()));
       }).catchError((e) {
         setState(() {
           result = "Kayıtlı Kullanıcı bulunamamaktadır";
         });
       });
     } catch (e) {
-      _auth
-          .signInWithEmailAndPassword(email: mail, password: password)
-          .then((u) {
-        file.writeAsString("$mail-$password");
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => HomePage(u.user.uid)));
-      }).catchError((e) {
-        setState(() {
-          result = "E-mail veya şifre hatalı\n";
-          result += "Veya bu hesap bilgileri ile Google ile giriş yapmışsınız\n";
-          result += "Google ile Giriş butonunu kullanınız\n";
-          result += "Veya İnternet Bağlantınızı kontrol edin\n";
-          result += "Veya Bu E-mail ve Şifre ile kayıtlı Kullanıcı bulunamamaktadır";
+      if(formKey.currentState.validate()){
+        formKey.currentState.save();
+        _auth
+            .signInWithEmailAndPassword(email: mail, password: password)
+            .then((u) {
+          file.writeAsString("$mail-$password");
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => HomePage()));
+        }).catchError((e) {
+          setState(() {
+            result = "E-mail veya şifre hatalı\n";
+            result += "Veya bu hesap bilgileri ile Google ile giriş yapmışsınız\n";
+            result += "Google ile Giriş butonunu kullanınız\n";
+            result += "Veya İnternet Bağlantınızı kontrol edin\n";
+            result += "Veya Bu E-mail ve Şifre ile kayıtlı Kullanıcı bulunamamaktadır";
+          });
         });
-      });
+      }
+      else{
+        setState(() {
+          otomatikKontrol = true;
+          result = "E-posta ve şifenizi doğru giriniz...";
+        });
+      }
     }
   }
 
@@ -240,7 +256,7 @@ class _LoginState extends State<Login> {
             });
           });
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => HomePage(user.user.uid)));
+              MaterialPageRoute(builder: (context) => HomePage()));
         }).catchError((hata) {
           setState(() {
             result = "Firebase ve google kullanıcı hatası";
@@ -256,5 +272,15 @@ class _LoginState extends State<Login> {
         result = "Google ile Girişde hata veya İnternet Bağlantınızı kontrol edin";
       });
     });
+  }
+
+  String _emailKontrol(String value) {
+    Pattern pattern =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regex = new RegExp(pattern);
+    if (!regex.hasMatch(value))
+      return 'Geçersiz mail';
+    else
+      return null;
   }
 }

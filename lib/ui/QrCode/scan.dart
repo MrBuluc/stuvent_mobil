@@ -3,19 +3,17 @@ import 'package:barcode_scan/barcode_scan.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 
 class ScanScreen extends StatefulWidget {
-  String uId;
-
-  ScanScreen(this.uId);
-
   @override
   _ScanState createState() => new _ScanState();
 }
 
 class _ScanState extends State<ScanScreen> {
   final Firestore _firestore = Firestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   String barcode = "";
   String result = "";
 
@@ -28,20 +26,20 @@ class _ScanState extends State<ScanScreen> {
     } on PlatformException catch (ex) {
       if (ex.code == BarcodeScanner.CameraAccessDenied) {
         setState(() {
-          barcode = "Camera permission was denied";
+          result = "Camera permission was denied\n";
         });
       } else {
         setState(() {
-          barcode = "Unknown Error $ex";
+          result = "Unknown Error $ex\n";
         });
       }
     } on FormatException {
       setState(() {
-        barcode = "You pressed the back button before scanning anything";
+        result = "You pressed the back button before scanning anything\n";
       });
     } catch (ex) {
       setState(() {
-        barcode = "Unknown Error $ex";
+        result = "Unknown Error $ex\n";
       });
     }
 
@@ -49,25 +47,34 @@ class _ScanState extends State<ScanScreen> {
       result = "Yoklama alınıyor...";
     });
 
-    final DocumentReference eventRef =
-    _firestore.document("Users/${widget.uId}");
+    _auth.currentUser().then(((user) {
+      String uId1 = user.uid;
+      final DocumentReference eventRef =
+      _firestore.document("Users/${uId1}");
 
-    List etkinlik;
-    _firestore.runTransaction((Transaction transaction) async {
-      DocumentSnapshot eventData = await eventRef.get();
-      etkinlik = eventData.data["Etkinlikler"];
-      etkinlik.add(barcode);
-      await transaction.update(eventRef, {"Etkinlikler": etkinlik}).then(
-              (onValue) {
-            setState(() {
-              result = "Yoklama alındı";
-            });
-          }).catchError((onError) {
-        setState(() {
-          result = "Yoklama alınırken sorun oluştu";
+      List etkinlik;
+      _firestore.runTransaction((Transaction transaction) async {
+        DocumentSnapshot eventData = await eventRef.get();
+        etkinlik = eventData.data["Etkinlikler"];
+        etkinlik.add(barcode);
+        await transaction.update(eventRef, {"Etkinlikler": etkinlik}).then(
+                (onValue) {
+              setState(() {
+                result = "Yoklama alındı";
+              });
+            }).catchError((onError) {
+          setState(() {
+            result = "Yoklama alınırken sorun oluştu";
+          });
         });
       });
+    })
+    ).catchError((e) {
+      setState(() {
+        result = "Kullanıcı getirilirken hata oluştu";
+      });
     });
+
   }
 
   @override
