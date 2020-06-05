@@ -17,14 +17,43 @@ class _ScanState extends State<ScanScreen> {
   String barcode = "";
   String result = "";
 
+
+  final _flashOnController = TextEditingController(text: "Flash on");
+  final _flashOffController = TextEditingController(text: "Flash off");
+  final _cancelController = TextEditingController(text: "Cancel");
+
+  var _aspectTolerance = 0.00;
+  var _selectedCamera = -1;
+  var _useAutoFocus = true;
+  var _autoEnableFlash = false;
+
+  static final _possibleFormats = BarcodeFormat.values.toList()
+    ..removeWhere((e) => e == BarcodeFormat.unknown);
+  List<BarcodeFormat> selectedFormats = [..._possibleFormats];
+
   Future _scanQR() async {
     try {
-      String qrResult = await BarcodeScanner.scan();
+      var options = ScanOptions(
+        strings: {
+          "cancel": _cancelController.text,
+          "flash_on": _flashOnController.text,
+          "flash_off": _flashOffController.text,
+        },
+        restrictFormat: selectedFormats,
+        useCamera: _selectedCamera,
+        autoEnableFlash: _autoEnableFlash,
+        android: AndroidOptions(
+          aspectTolerance: _aspectTolerance,
+          useAutoFocus: _useAutoFocus,
+        ),
+      );
+
+      var resul = await BarcodeScanner.scan(options: options);
       setState(() {
-        barcode = qrResult;
+        barcode = resul.rawContent;
       });
     } on PlatformException catch (ex) {
-      if (ex.code == BarcodeScanner.CameraAccessDenied) {
+      if (ex.code == BarcodeScanner.cameraAccessDenied) {
         setState(() {
           result = "Camera permission was denied\n";
         });
@@ -48,9 +77,9 @@ class _ScanState extends State<ScanScreen> {
     });
 
     _auth.currentUser().then(((user) {
-      String uId1 = user.uid;
+      String uId = user.uid;
       final DocumentReference eventRef =
-      _firestore.document("Users/${uId1}");
+      _firestore.document("Users/$uId");
 
       List etkinlik;
       _firestore.runTransaction((Transaction transaction) async {

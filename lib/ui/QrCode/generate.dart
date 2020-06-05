@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:qr_flutter/qr_flutter.dart';
+import 'package:qr_flutter/src/qr_image.dart';
 import 'dart:ui';
 import 'package:flutter/rendering.dart';
 
@@ -24,7 +24,7 @@ class GenerateScreenState extends State<GenerateScreen> {
   static const double _topSectionHeight = 50.0;
 
   GlobalKey globalKey = new GlobalKey();
-  String _inputErrorText;
+  //String _inputErrorText;
   final TextEditingController _textController =  TextEditingController();
 
   @override
