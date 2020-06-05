@@ -11,7 +11,8 @@ class GeneratEvent extends StatefulWidget {
 }
 
 class _GeneratEventState extends State<GeneratEvent> {
-  String event_name, location, url, category;
+  String event_name, location, url;
+  int category;
   String result = "";
   final formKey = GlobalKey<FormState>();
   final Firestore _firestore = Firestore.instance;
@@ -79,9 +80,9 @@ class _GeneratEventState extends State<GeneratEvent> {
                   SizedBox(
                     height: 10,
                   ),
-                  DropdownButton<String>(
+                  DropdownButton<int>(
                     items: [
-                      DropdownMenuItem<String>(
+                      DropdownMenuItem<int>(
                         child: Row(
                           children: <Widget>[
                             Container(
@@ -92,9 +93,9 @@ class _GeneratEventState extends State<GeneratEvent> {
                             Text("CS"),
                           ],
                         ),
-                        value: "CS",
+                        value: 1,
                       ),
-                      DropdownMenuItem<String>(
+                      DropdownMenuItem<int>(
                         child: Row(
                           children: <Widget>[
                             Container(
@@ -105,9 +106,9 @@ class _GeneratEventState extends State<GeneratEvent> {
                             Text("EA"),
                           ],
                         ),
-                        value: "EA",
+                        value: 2,
                       ),
-                      DropdownMenuItem<String>(
+                      DropdownMenuItem<int>(
                         child: Row(
                           children: <Widget>[
                             Container(
@@ -118,9 +119,9 @@ class _GeneratEventState extends State<GeneratEvent> {
                             Text("PES"),
                           ],
                         ),
-                        value: "PES",
+                        value: 3,
                       ),
-                      DropdownMenuItem<String>(
+                      DropdownMenuItem<int>(
                         child: Row(
                           children: <Widget>[
                             Container(
@@ -131,9 +132,9 @@ class _GeneratEventState extends State<GeneratEvent> {
                             Text("RAS"),
                           ],
                         ),
-                        value: "RAS",
+                        value: 4,
                       ),
-                      DropdownMenuItem<String>(
+                      DropdownMenuItem<int>(
                         child: Row(
                           children: <Widget>[
                             Container(
@@ -144,10 +145,10 @@ class _GeneratEventState extends State<GeneratEvent> {
                             Text("WIE"),
                           ],
                         ),
-                        value: "WIE",
+                        value: 5,
                       ),
                     ],
-                    onChanged: (String secilen) {
+                    onChanged: (int secilen) {
                       setState(() {
                         category = secilen;
                       });
@@ -215,50 +216,57 @@ class _GeneratEventState extends State<GeneratEvent> {
   }
 
   _veriEkle() async {
-    setState(() {
-      result = "Etkinlik oluşturuluyor...";
-    });
-
-    StorageReference ref = FirebaseStorage.instance
-        .ref()
-        .child("Etkinlikler")
-        .child(event_name)
-        .child("event_photo.png");
-    StorageUploadTask uploadTask = ref.putFile(_secilenResim);
-    url = await (await uploadTask.onComplete).ref.getDownloadURL();
-
-    QuerySnapshot querySnapshot =
-    await _firestore.collection("Etkinlikler").getDocuments();
-
-    Map map = querySnapshot.documents.asMap();
-    int len = map.length;
-    List Katilimcilar = ["0"];
-
-    List categoryList = [0];
-    categoryList.add(category);
-
-    formKey.currentState.save();
-    Map<String, dynamic> data = Map();
-    data["Etkinlik Adı"] = event_name;
-    data["Etkinlik Konumu"] = location;
-    data["Etkinlik Tarihi"] = tamTarih;
-    data["Etkinlik Photo Url"] = url;
-    data["category"] = categoryList;
-    data["Katilimcilar"] = Katilimcilar;
-
-    _firestore
-        .collection("Etkinlikler")
-        .document(len.toString())
-        .setData(data)
-        .then((v) {
+    if(_secilenResim == null){
       setState(() {
-        result = "Etkinlik Oluşturuldu.";
+        result = "Lütfen resim yükleyiniz!!!";
       });
-    }).catchError((onError) {
+    }
+    else{
       setState(() {
-        result = "Etkinlik Oluşturulurken sorun oluştu $onError";
+        result = "Etkinlik oluşturuluyor...";
       });
-    });
+
+      StorageReference ref = FirebaseStorage.instance
+          .ref()
+          .child("Etkinlikler")
+          .child(event_name)
+          .child("event_photo.png");
+      StorageUploadTask uploadTask = ref.putFile(_secilenResim);
+      url = await (await uploadTask.onComplete).ref.getDownloadURL();
+
+      QuerySnapshot querySnapshot =
+      await _firestore.collection("Etkinlikler").getDocuments();
+
+      Map map = querySnapshot.documents.asMap();
+      int len = map.length;
+      List Katilimcilar = ["0"];
+
+      List categoryList = [0];
+      categoryList.add(category);
+
+      formKey.currentState.save();
+      Map<String, dynamic> data = Map();
+      data["Etkinlik Adı"] = event_name;
+      data["Etkinlik Konumu"] = location;
+      data["Etkinlik Tarihi"] = tamTarih;
+      data["Etkinlik Photo Url"] = url;
+      data["category"] = categoryList;
+      data["Katilimcilar"] = Katilimcilar;
+
+      _firestore
+          .collection("Etkinlikler")
+          .document(len.toString())
+          .setData(data)
+          .then((v) {
+        setState(() {
+          result = "Etkinlik Oluşturuldu.";
+        });
+      }).catchError((onError) {
+        setState(() {
+          result = "Etkinlik Oluşturulurken sorun oluştu $onError";
+        });
+      });
+    }
   }
 
   _galeriResimUpload() async {
