@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../model/event.dart';
@@ -5,6 +7,8 @@ import 'package:stuventmobil/ui/QrCode/generate.dart';
 import 'package:stuventmobil/ui/QrCode/scan.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_document_picker/flutter_document_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class EventDetailsPage extends StatefulWidget {
   final Event event;
@@ -19,6 +23,10 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   final Firestore _firestore = Firestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   bool superU = false;
+  bool _pickFileInProgress = false;
+  //final _scaffoldKey = GlobalKey<ScaffoldState>();
+  String url;
+  List<dynamic> docList;
 
   @override
   void initState() {
@@ -35,7 +43,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Center(
-              heightFactor: 2.0,
+              heightFactor: 1.25,
               child: Hero(
                 tag: widget.event.title,
                 child: FadeInImage.assetNetwork(
@@ -43,6 +51,25 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   image: widget.event.imageURL,
                   height: 300.0,
                   fit: BoxFit.fitWidth,
+                ),
+              ),
+            ),
+            SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      "Dosyalar:",
+                      style: TextStyle(color: Colors.red, fontSize: 20),
+                    ),
+                    for (final docname in widget.event.documentsList)
+                      Text(
+                        docname,
+                        style: TextStyle(color: Colors.green, fontSize: 15),
+                      )
+                  ],
                 ),
               ),
             ),
@@ -78,6 +105,18 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                       },
                       child: const Text('QR oluştur')),
                 ),
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                child: RaisedButton(
+                  color: Colors.green,
+                  textColor: Colors.white,
+                  splashColor: Colors.blueGrey,
+                  onPressed: () {
+                    _pickFileInProgress ? null : _pickDocument();
+                  },
+                  child: const Text("Dosya Paylaş"),
+                ),
+              )
             ])
           ],
         ),
@@ -95,5 +134,44 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         superU = documentSnapshot.data["SuperUser"];
       });
     });
+  }
+
+  _pickDocument() async {
+    String result;
+    try {
+      setState(() {
+        _pickFileInProgress = true;
+      });
+
+      result = await FlutterDocumentPicker.openDocument();
+      File file = new File(result);
+      String fileName = file.path.split("/").removeLast();
+
+      StorageReference ref = FirebaseStorage.instance
+          .ref()
+          .child("Etkinlikler")
+          .child(widget.event.title)
+          .child(fileName);
+      StorageUploadTask uploadTask = ref.putFile(file);
+      url = await (await uploadTask.onComplete).ref.getDownloadURL();
+
+      docList = widget.event.documentsList;
+      docList.add(fileName);
+
+      _firestore
+          .collection("Etkinlikler")
+          .document(widget.event.title)
+          .updateData({"Dosyalar": docList}).then((v) {
+            debugPrint("Dosyalar Güncellendi");
+          }).catchError((onError) {
+            debugPrint("Hata: "+ onError.toString());
+          });
+    } catch (e) {
+      debugPrint("Hata2: "+ e.toString());
+    } finally {
+      setState(() {
+        _pickFileInProgress = false;
+      });
+    }
   }
 }

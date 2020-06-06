@@ -1,13 +1,24 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 
 class Event {
   final String title, location, imageURL;
-  final Timestamp date;
   final List categoryIds;
+  final List<dynamic> documentsList;
+
+  @override
+  String toString() {
+    return "title: $title \n"+
+            "location: $location \n"+
+            "categoryIds: $categoryIds \n"+
+            "documentsList: $documentsList \n";
+  }
 
   Event(
-      {this.title, this.location, this.date, this.categoryIds, this.imageURL});
+      {this.title,
+      this.location,
+      this.categoryIds,
+      this.imageURL,
+      this.documentsList});
 }
 
 final List<Event> events = [];
@@ -16,7 +27,7 @@ final Firestore _firestore = Firestore.instance;
 
 String ad, konum, url;
 List categoryList;
-Timestamp date;
+List<dynamic> docList;
 
 Future<void> read() async {
   events.clear();
@@ -24,23 +35,21 @@ Future<void> read() async {
   QuerySnapshot querySnapshot =
       await _firestore.collection("Etkinlikler").getDocuments();
 
-  Map map = querySnapshot.documents.asMap();
-  int len = map.length;
-  for (int i = 0; i < len; i++) {
-    DocumentSnapshot documentSnapshot =
-        await _firestore.document("Etkinlikler/$i").get();
+  List<DocumentSnapshot> documentSnapshotList = querySnapshot.documents;
+
+  documentSnapshotList.forEach((documentSnapshot) {
     ad = documentSnapshot.data["Etkinlik Adı"];
     konum = documentSnapshot.data["Etkinlik Konumu"];
     url = documentSnapshot.data["Etkinlik Photo Url"];
-    date = documentSnapshot.data["Etkinlik Tarihi"];
     categoryList = documentSnapshot.data["category"];
+    docList = documentSnapshot.data["Dosyalar"];
 
     Event event = new Event(
         title: ad,
         location: konum,
-        date: date,
         categoryIds: categoryList,
-        imageURL: url);
+        imageURL: url,
+        documentsList: docList);
     events.add(event);
-  }
+  });
 }

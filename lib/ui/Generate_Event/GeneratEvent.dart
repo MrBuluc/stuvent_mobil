@@ -16,12 +16,6 @@ class _GeneratEventState extends State<GeneratEvent> {
   String result = "";
   final formKey = GlobalKey<FormState>();
   final Firestore _firestore = Firestore.instance;
-  static DateTime suan = DateTime.now();
-  DateTime yilSonu = DateTime(suan.year + 1, 5, 15);
-  DateTime time, tamTarih;
-
-  TimeOfDay suankiSaat = TimeOfDay.now();
-  TimeOfDay saat;
 
   File _secilenResim;
 
@@ -156,34 +150,6 @@ class _GeneratEventState extends State<GeneratEvent> {
                     hint: Text("Komunite Seçiniz"),
                     value: category,
                   ),
-                  RaisedButton(
-                    child: Text("Tarih Seç"),
-                    color: Colors.green,
-                    onPressed: () {
-                      showDatePicker(
-                              context: context,
-                              initialDate: suan,
-                              firstDate: suan,
-                              lastDate: yilSonu)
-                          .then((secilenTarih) {
-                        time = secilenTarih;
-                      });
-                    },
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  RaisedButton(
-                    child: Text("Saat Seç"),
-                    color: Colors.blue,
-                    onPressed: () {
-                      showTimePicker(context: context, initialTime: suankiSaat)
-                          .then((secilenSaat) {
-                        tamTarih = DateTime(time.year, time.month, time.day,
-                            secilenSaat.hour, secilenSaat.minute);
-                      });
-                    },
-                  ),
                   SizedBox(
                     height: 10,
                   ),
@@ -234,28 +200,25 @@ class _GeneratEventState extends State<GeneratEvent> {
       StorageUploadTask uploadTask = ref.putFile(_secilenResim);
       url = await (await uploadTask.onComplete).ref.getDownloadURL();
 
-      QuerySnapshot querySnapshot =
-      await _firestore.collection("Etkinlikler").getDocuments();
-
-      Map map = querySnapshot.documents.asMap();
-      int len = map.length;
-      List Katilimcilar = ["0"];
+      List Katilimcilar = [];
 
       List categoryList = [0];
       categoryList.add(category);
+
+      List<String> docList = [];
 
       formKey.currentState.save();
       Map<String, dynamic> data = Map();
       data["Etkinlik Adı"] = event_name;
       data["Etkinlik Konumu"] = location;
-      data["Etkinlik Tarihi"] = tamTarih;
       data["Etkinlik Photo Url"] = url;
       data["category"] = categoryList;
       data["Katilimcilar"] = Katilimcilar;
+      data["Dosyalar"] = docList;
 
       _firestore
           .collection("Etkinlikler")
-          .document(len.toString())
+          .document(event_name)
           .setData(data)
           .then((v) {
         setState(() {
@@ -271,6 +234,7 @@ class _GeneratEventState extends State<GeneratEvent> {
 
   _galeriResimUpload() async {
     var resim = await ImagePicker.pickImage(source: ImageSource.gallery);
+
     setState(() {
       _secilenResim = resim;
     });
