@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_document_picker/flutter_document_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EventDetailsPage extends StatefulWidget {
   final Event event;
@@ -24,9 +25,10 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   bool superU = false;
   bool _pickFileInProgress = false;
-  //final _scaffoldKey = GlobalKey<ScaffoldState>();
   String url;
-  List<dynamic> docList;
+  Map<String, dynamic> docMap;
+  List<String> docMapKeys;
+  bool control = true;
 
   @override
   void initState() {
@@ -60,15 +62,37 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(
-                      "Dosyalar:",
-                      style: TextStyle(color: Colors.red, fontSize: 20),
+                    Row(
+                      children: <Widget>[
+                        Text(
+                          "Dosyalar:",
+                          style: TextStyle(color: Colors.red, fontSize: 20),
+                        ),
+                      ],
                     ),
-                    for (final docname in widget.event.documentsList)
-                      Text(
-                        docname,
-                        style: TextStyle(color: Colors.green, fontSize: 15),
-                      )
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        for(final keys in docMapKeys)
+                          GestureDetector(
+                            onTap: () async {
+                              if(await canLaunch(docMap[keys])){
+                                await launch(docMap[keys]);
+                              } else{
+                                debugPrint("Could not launch $docMap[keys]");
+                              }
+                            },
+                            child: Text(
+                              keys,
+                              style: TextStyle(color: Colors.green, fontSize: 18),
+                            ),
+                          )
+                      ],
+                    )
+                    /*myWidget(
+                      control: control,
+                      docMap: docMap,
+                    ),*/
                   ],
                 ),
               ),
@@ -105,19 +129,20 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                       },
                       child: const Text('QR oluştur')),
                 ),
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                child: RaisedButton(
-                  color: Colors.green,
-                  textColor: Colors.white,
-                  splashColor: Colors.blueGrey,
-                  onPressed: () {
-                    _pickFileInProgress ? null : _pickDocument();
-                  },
-                  child: const Text("Dosya Paylaş"),
-                ),
-              )
-            ])
+            ]),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              child: RaisedButton(
+                color: Colors.green,
+                textColor: Colors.white,
+                splashColor: Colors.blueGrey,
+                onPressed: () {
+                  _pickFileInProgress ? null : _pickDocument();
+                },
+                child: Text(
+                    _pickFileInProgress ? "Dosya Yükleniyor" : "Dosya Paylaş"),
+              ),
+            )
           ],
         ),
       ),
@@ -125,6 +150,13 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   }
 
   Future<void> superUser() async {
+    docMap = widget.event.documentsMap;
+    if (docMap.isNotEmpty) {
+      setState(() {
+        control = false;
+        docMapKeys = docMap.keys.toList();
+      });
+    }
     _auth.currentUser().then((user) async {
       String uId = user.uid;
       DocumentSnapshot documentSnapshot =
@@ -155,23 +187,65 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       StorageUploadTask uploadTask = ref.putFile(file);
       url = await (await uploadTask.onComplete).ref.getDownloadURL();
 
-      docList = widget.event.documentsList;
-      docList.add(fileName);
+      docMap[fileName] = url;
 
       _firestore
           .collection("Etkinlikler")
           .document(widget.event.title)
-          .updateData({"Dosyalar": docList}).then((v) {
-            debugPrint("Dosyalar Güncellendi");
-          }).catchError((onError) {
-            debugPrint("Hata: "+ onError.toString());
-          });
+          .updateData({"Dosyalar": docMap}).then((v) {
+        debugPrint("Dosyalar Güncellendi");
+        setState(() {
+          control = false;
+        });
+      }).catchError((onError) {
+        debugPrint("Hata: " + onError.toString());
+      });
     } catch (e) {
-      debugPrint("Hata2: "+ e.toString());
+      debugPrint("Hata2: " + e.toString());
     } finally {
       setState(() {
         _pickFileInProgress = false;
       });
     }
+  }
+
+  /*Widget myWidget() {
+    debugPrint("Docmap: " + docMap.toString());
+    docMap.forEach((key, value) {
+      return myWidget2(key2: key, value: value,);
+    });
+  }*/
+}
+
+class myWidget extends StatelessWidget {
+  bool control;
+  Map<String, dynamic> docMap;
+  myWidget({Key key, this.control, this.docMap}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    if (!control) {
+      debugPrint("docMap: $docMap");
+      docMap.forEach((key, value) {
+        return Container(
+          width: 0,
+          height: 0,
+          child: GestureDetector(
+            onTap: () async {
+              if (await canLaunch(value)) {
+                await launch(value);
+              } else {
+                debugPrint("Could not launch $value");
+              }
+            },
+            child: Text(
+              key,
+              style: TextStyle(color: Colors.green, fontSize: 15),
+            ),
+          ),
+        );
+      });
+    }
+    return Text("Paylaşılan dosya yok");
   }
 }

@@ -205,7 +205,7 @@ class _GeneratEventState extends State<GeneratEvent> {
       List categoryList = [0];
       categoryList.add(category);
 
-      List<String> docList = [];
+      Map<String, dynamic> docMap = {};
 
       formKey.currentState.save();
       Map<String, dynamic> data = Map();
@@ -214,7 +214,7 @@ class _GeneratEventState extends State<GeneratEvent> {
       data["Etkinlik Photo Url"] = url;
       data["category"] = categoryList;
       data["Katilimcilar"] = Katilimcilar;
-      data["Dosyalar"] = docList;
+      data["Dosyalar"] = docMap;
 
       _firestore
           .collection("Etkinlikler")

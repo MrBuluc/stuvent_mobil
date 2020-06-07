@@ -1,16 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 
 class Event {
   final String title, location, imageURL;
   final List categoryIds;
-  final List<dynamic> documentsList;
+  final Map<String, dynamic> documentsMap;
 
   @override
   String toString() {
     return "title: $title \n"+
             "location: $location \n"+
             "categoryIds: $categoryIds \n"+
-            "documentsList: $documentsList \n";
+            "documentsList: $documentsMap \n";
   }
 
   Event(
@@ -18,7 +19,7 @@ class Event {
       this.location,
       this.categoryIds,
       this.imageURL,
-      this.documentsList});
+      this.documentsMap});
 }
 
 final List<Event> events = [];
@@ -27,7 +28,7 @@ final Firestore _firestore = Firestore.instance;
 
 String ad, konum, url;
 List categoryList;
-List<dynamic> docList;
+Map<String, dynamic> docMap;
 
 Future<void> read() async {
   events.clear();
@@ -38,18 +39,24 @@ Future<void> read() async {
   List<DocumentSnapshot> documentSnapshotList = querySnapshot.documents;
 
   documentSnapshotList.forEach((documentSnapshot) {
-    ad = documentSnapshot.data["Etkinlik Adı"];
-    konum = documentSnapshot.data["Etkinlik Konumu"];
-    url = documentSnapshot.data["Etkinlik Photo Url"];
-    categoryList = documentSnapshot.data["category"];
-    docList = documentSnapshot.data["Dosyalar"];
+    try{
+      ad = documentSnapshot.data["Etkinlik Adı"];
+      konum = documentSnapshot.data["Etkinlik Konumu"];
+      url = documentSnapshot.data["Etkinlik Photo Url"];
+      categoryList = documentSnapshot.data["category"];
+      docMap = documentSnapshot.data["Dosyalar"];
 
-    Event event = new Event(
-        title: ad,
-        location: konum,
-        categoryIds: categoryList,
-        imageURL: url,
-        documentsList: docList);
-    events.add(event);
+
+      Event event = new Event(
+          title: ad,
+          location: konum,
+          categoryIds: categoryList,
+          imageURL: url,
+          documentsMap: docMap);
+      events.add(event);
+    }catch(e) {
+      debugPrint("Hata: $e");
+    }
+
   });
 }
