@@ -89,10 +89,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                           )
                       ],
                     )
-                    /*myWidget(
-                      control: control,
-                      docMap: docMap,
-                    ),*/
                   ],
                 ),
               ),
@@ -209,43 +205,4 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     }
   }
 
-  /*Widget myWidget() {
-    debugPrint("Docmap: " + docMap.toString());
-    docMap.forEach((key, value) {
-      return myWidget2(key2: key, value: value,);
-    });
-  }*/
-}
-
-class myWidget extends StatelessWidget {
-  bool control;
-  Map<String, dynamic> docMap;
-  myWidget({Key key, this.control, this.docMap}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    if (!control) {
-      debugPrint("docMap: $docMap");
-      docMap.forEach((key, value) {
-        return Container(
-          width: 0,
-          height: 0,
-          child: GestureDetector(
-            onTap: () async {
-              if (await canLaunch(value)) {
-                await launch(value);
-              } else {
-                debugPrint("Could not launch $value");
-              }
-            },
-            child: Text(
-              key,
-              style: TextStyle(color: Colors.green, fontSize: 15),
-            ),
-          ),
-        );
-      });
-    }
-    return Text("Paylaşılan dosya yok");
-  }
 }
