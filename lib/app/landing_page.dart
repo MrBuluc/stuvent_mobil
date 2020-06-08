@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:stuventmobil/user_repository.dart';
+import 'file:///C:/Users/HAKKICAN/Desktop/Sifirdan%20Flutter%20ile%20Android%20ve%20Ios%20Apps%20Development/flutter%20projeleri/stuvent_hakkican/lib/repository/user_repository.dart';
 import 'package:provider/provider.dart';
 
 import 'package:stuventmobil/ui/homepage/home_page.dart';
@@ -20,6 +20,8 @@ class LandingPage extends StatelessWidget{
           return Login();
         case UserDurum.OturumAcik:
           return HomePage();
+        default :
+          return SplashEkran();
       }
     });
   }

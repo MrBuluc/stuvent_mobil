@@ -17,7 +17,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   @override
   void initState() {
     // TODO: implement initState
@@ -105,12 +104,14 @@ class _HomePageState extends State<HomePage> {
                                       .contains(appState.selectedCategoryId))
                                     GestureDetector(
                                       onTap: () {
-                                        Navigator.of(context)
-                                            .push(MaterialPageRoute(
-                                          builder: (context) => EventDetailsPage(
-                                            event: event,
-                                          ),
-                                        ));
+                                        Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  EventDetailsPage(
+                                                event: event,
+                                              ),
+                                            ));
                                       },
                                       child: EventWidget(
                                         event: event,

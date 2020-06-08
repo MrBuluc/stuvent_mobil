@@ -8,7 +8,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:stuventmobil/ui/Login/login.dart';
 import 'package:stuventmobil/ui/Generate_Event/GeneratEvent.dart';
-import 'package:stuventmobil/user_repository.dart';
+import 'file:///C:/Users/HAKKICAN/Desktop/Sifirdan%20Flutter%20ile%20Android%20ve%20Ios%20Apps%20Development/flutter%20projeleri/stuvent_hakkican/lib/repository/user_repository.dart';
 
 class Profil extends StatefulWidget {
   @override
@@ -28,13 +28,6 @@ class _ProfilState extends State<Profil> {
   bool superU = false;
   bool otomatikKontrol = false;
 
-  /*@override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    read();
-  }*/
-
   @override
   void dispose() {
     // TODO: implement dispose
@@ -45,17 +38,15 @@ class _ProfilState extends State<Profil> {
   @override
   Widget build(BuildContext context) {
     final userRepo = Provider.of<UserRepository>(context);
-    userRepo.read().then(((map){
-      final userMap = map;
-      read(userMap);
+    userRepo.read().then(((map) {
+      read(map);
     }));
     return Theme(
       data: Theme.of(context).copyWith(
-        accentColor: Colors.green,
-        hintColor: Colors.indigo,
-        errorColor: Colors.red,
-        primaryColor: Color(0xffAA00AA)
-      ),
+          accentColor: Colors.green,
+          hintColor: Colors.indigo,
+          errorColor: Colors.red,
+          primaryColor: Color(0xffAA00AA)),
       child: Scaffold(
         appBar: AppBar(
           title: Text("Profil"),
@@ -110,7 +101,7 @@ class _ProfilState extends State<Profil> {
                   ),
                   initialValue: "123456",
                   validator: (String value) {
-                    if(value.length < 6) {
+                    if (value.length < 6) {
                       return "En az 6 karakter gerekli";
                     }
                     return null;
@@ -146,7 +137,7 @@ class _ProfilState extends State<Profil> {
                 SizedBox(
                   height: 10,
                 ),
-                if(superU)
+                if (superU)
                   RaisedButton(
                     child: Text(
                       "Yeni Etkinlik Oluştur",
@@ -160,14 +151,15 @@ class _ProfilState extends State<Profil> {
                     },
                     color: Colors.green,
                   ),
-                if(superU)
+                if (superU)
                   SizedBox(
                     height: 10,
                   ),
                 RaisedButton(
                   child: Text(
                     "Oturumu Kapat",
-                    style: TextStyle(color: Colors.black,fontWeight: FontWeight.w800),
+                    style: TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.w800),
                   ),
                   onPressed: () {
                     userRepo.signOut();
@@ -179,7 +171,7 @@ class _ProfilState extends State<Profil> {
                 ),
                 Padding(
                   padding:
-                  EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                   child: Text(
                     result,
                     textAlign: TextAlign.center,
@@ -193,7 +185,7 @@ class _ProfilState extends State<Profil> {
     );
   }
 
-  void read(Map uMap){
+  void read(Map uMap) {
     setState(() {
       name = uMap["Ad"];
       mail = uMap["E-mail"];
@@ -207,7 +199,7 @@ class _ProfilState extends State<Profil> {
       result = "Şifre Güncelleniyor...";
     });
 
-    if(formKey.currentState.validate()){
+    if (formKey.currentState.validate()) {
       formKey.currentState.save();
       _auth.currentUser().then((user) {
         user.updatePassword(password).then((a) async {
@@ -229,8 +221,7 @@ class _ProfilState extends State<Profil> {
           result += "Yeni şifreniz alanı boş geçilemez";
         });
       });
-    }
-    else{
+    } else {
       setState(() {
         otomatikKontrol = true;
         result = "Girilen Bilgileri Doğru giriniz";
@@ -250,7 +241,6 @@ class _ProfilState extends State<Profil> {
 
   void _cikisyap() {
     _auth.signOut().then((data) async {
-
       _googleAuth.signOut();
 
       Directory directory = await getApplicationDocumentsDirectory();
@@ -274,7 +264,7 @@ class _ProfilState extends State<Profil> {
       result = "E-mail Güncelleniyor...";
     });
 
-    if(formKey.currentState.validate()){
+    if (formKey.currentState.validate()) {
       formKey.currentState.save();
       _auth.currentUser().then((user) {
         String uId = user.uid;
@@ -291,7 +281,7 @@ class _ProfilState extends State<Profil> {
             String user = await file.readAsString();
             var arr = user.split("-");
             password = arr[1];
-          }catch(e) {
+          } catch (e) {
             setState(() {
               result = "Dosya okumada hata";
             });
@@ -312,8 +302,7 @@ class _ProfilState extends State<Profil> {
           result += "Yeni E-mail alanı boş geçilemez";
         });
       });
-    }
-    else{
+    } else {
       setState(() {
         otomatikKontrol = true;
         result = "Girilen Bilgileri Doğru giriniz";

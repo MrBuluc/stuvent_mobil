@@ -7,7 +7,7 @@ import 'package:stuventmobil/ui/homepage/home_page.dart';
 import 'dart:io';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:stuventmobil/user_repository.dart';
+import 'file:///C:/Users/HAKKICAN/Desktop/Sifirdan%20Flutter%20ile%20Android%20ve%20Ios%20Apps%20Development/flutter%20projeleri/stuvent_hakkican/lib/repository/user_repository.dart';
 
 class Login extends StatefulWidget {
   @override

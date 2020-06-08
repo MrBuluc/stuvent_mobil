@@ -2,14 +2,15 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:stuventmobil/common_widget/platform_duyarli_alert_dialog.dart';
 import '../../model/event.dart';
 import 'package:stuventmobil/ui/QrCode/generate.dart';
 import 'package:stuventmobil/ui/QrCode/scan.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_document_picker/flutter_document_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class EventDetailsPage extends StatefulWidget {
   final Event event;
@@ -73,18 +74,19 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        for(final keys in docMapKeys)
+                        for (final keys in docMapKeys)
                           GestureDetector(
                             onTap: () async {
-                              if(await canLaunch(docMap[keys])){
+                              if (await canLaunch(docMap[keys])) {
                                 await launch(docMap[keys]);
-                              } else{
+                              } else {
                                 debugPrint("Could not launch $docMap[keys]");
                               }
                             },
                             child: Text(
                               keys,
-                              style: TextStyle(color: Colors.green, fontSize: 18),
+                              style:
+                                  TextStyle(color: Colors.green, fontSize: 18),
                             ),
                           )
                       ],
@@ -129,14 +131,15 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             Padding(
               padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
               child: RaisedButton(
-                color: Colors.green,
+                color: _pickFileInProgress ? Colors.grey : Colors.green,
                 textColor: Colors.white,
                 splashColor: Colors.blueGrey,
                 onPressed: () {
-                  _pickFileInProgress ? null : _pickDocument();
+                  _pickFileInProgress ? null : _pickDocument(context);
                 },
                 child: Text(
-                    _pickFileInProgress ? "Dosya Yükleniyor" : "Dosya Paylaş"),
+                  _pickFileInProgress ? "Dosya Yükleniyor" : "Dosya Paylaş",
+                ),
               ),
             )
           ],
@@ -164,7 +167,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     });
   }
 
-  _pickDocument() async {
+  _pickDocument(BuildContext context) async {
     String result;
     try {
       setState(() {
@@ -190,19 +193,50 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           .document(widget.event.title)
           .updateData({"Dosyalar": docMap}).then((v) {
         debugPrint("Dosyalar Güncellendi");
+
+        showDialog(
+            context: context,
+            builder: (context) {
+              return PlatformDuyarliAlertDialog(
+                baslik: "Dosyalar Güncellendi",
+                icerik: "",
+                anaButonYazisi: "Tamam",
+              );
+            });
+
         setState(() {
           control = false;
+          docMapKeys = docMap.keys.toList();
         });
       }).catchError((onError) {
         debugPrint("Hata: " + onError.toString());
+
+        showDialog(
+            context: context,
+            builder: (context) {
+              return PlatformDuyarliAlertDialog(
+                baslik: "Hata",
+                icerik: onError.toString(),
+                anaButonYazisi: "Tamam",
+              );
+            });
       });
     } catch (e) {
       debugPrint("Hata2: " + e.toString());
+
+      showDialog(
+          context: context,
+          builder: (context) {
+            return PlatformDuyarliAlertDialog(
+              baslik: "Hata",
+              icerik: e.toString(),
+              anaButonYazisi: "Tamam",
+            );
+          });
     } finally {
       setState(() {
         _pickFileInProgress = false;
       });
     }
   }
-
 }
