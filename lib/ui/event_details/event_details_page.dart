@@ -192,47 +192,31 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           .collection("Etkinlikler")
           .document(widget.event.title)
           .updateData({"Dosyalar": docMap}).then((v) {
-        debugPrint("Dosyalar Güncellendi");
 
-        showDialog(
-            context: context,
-            builder: (context) {
-              return PlatformDuyarliAlertDialog(
-                baslik: "Dosyalar Güncellendi",
-                icerik: "",
-                anaButonYazisi: "Tamam",
-              );
-            });
+        PlatformDuyarliAlertDialog(
+          baslik: "Dosyalar Güncellendi",
+          icerik: "",
+          anaButonYazisi: "Tamam",
+        ).goster(context);
 
         setState(() {
           control = false;
           docMapKeys = docMap.keys.toList();
         });
       }).catchError((onError) {
-        debugPrint("Hata: " + onError.toString());
 
-        showDialog(
-            context: context,
-            builder: (context) {
-              return PlatformDuyarliAlertDialog(
-                baslik: "Hata",
-                icerik: onError.toString(),
-                anaButonYazisi: "Tamam",
-              );
-            });
+        PlatformDuyarliAlertDialog(
+          baslik: "Dosyalar Güncellendi",
+          icerik: onError.toString(),
+          anaButonYazisi: "Tamam",
+        ).goster(context);
       });
     } catch (e) {
-      debugPrint("Hata2: " + e.toString());
-
-      showDialog(
-          context: context,
-          builder: (context) {
-            return PlatformDuyarliAlertDialog(
-              baslik: "Hata",
-              icerik: e.toString(),
-              anaButonYazisi: "Tamam",
-            );
-          });
+      PlatformDuyarliAlertDialog(
+        baslik: "Dosyalar Güncellendi",
+        icerik: e.toString(),
+        anaButonYazisi: "Tamam",
+      ).goster(context);
     } finally {
       setState(() {
         _pickFileInProgress = false;

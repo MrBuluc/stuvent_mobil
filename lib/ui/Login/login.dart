@@ -149,90 +149,14 @@ class _LoginState extends State<Login> {
   }
 
   Future<void> _sifremiUnuttum() async {
-    setState(() {
-      result = "Şifre gösteriliyor...";
-    });
     formKey.currentState.save();
-    Directory directory = await getApplicationDocumentsDirectory();
-    String path = directory.path;
-    File file = File("$path/user.txt");
-    try {
-      String user = await file.readAsString();
-      var arr = user.split("-");
-      String mail1 = arr[0];
-      password = arr[1];
-      if (mail == mail1) {
-        setState(() {
-          result = "Şifreniz: $password";
-        });
-      } else {
-        setState(() {
-          result = "Bu telefona kayıtlı E-mail bu değildir";
-        });
-      }
-    } catch (e) {
+    _auth.sendPasswordResetEmail(email: mail).then((v) {
       setState(() {
-        result = "Bu telefona kayıtlı User bulunamamıştır\n";
-        result += "Şifre sıfırlama E-mail ı gönderiliyor...\n";
+        result = "Şifre sıfırlama E-mail ı gönderildi";
       });
-
-      _auth.sendPasswordResetEmail(email: mail).then((v) {
-        setState(() {
-          result += "Şifre sıfırlama E-mail ı gönderildi";
-        });
-      }).catchError((e) {
-        setState(() {
-          result += "Şifremi unuttum mailinde hata";
-        });
-      });
-    }
-  }
-
-  void _googleGiris() {
-    setState(() {
-      result = "Giriş yapılıyor...";
-    });
-
-    _googleAuth.signIn().then((sonuc) {
-      sonuc.authentication.then((googleKeys) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(
-            idToken: googleKeys.idToken, accessToken: googleKeys.accessToken);
-
-        _auth.signInWithCredential(credential).then((user) {
-          List etkinlikler = ["0"];
-
-          Map<String, dynamic> data = Map();
-          data["Ad"] = user.user.displayName;
-          data["E-mail"] = user.user.email;
-          data["UserID"] = user.user.uid;
-          data["SuperUser"] = false;
-          data["Etkinlikler"] = etkinlikler;
-
-          _firestore
-              .collection("Users")
-              .document(user.user.uid)
-              .setData(data)
-              .catchError((onError) {
-            setState(() {
-              result = "Üye Database'e Kayıt edilirken sorun oluştu $onError";
-            });
-          });
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => HomePage()));
-        }).catchError((hata) {
-          setState(() {
-            result = "Firebase ve google kullanıcı hatası";
-          });
-        });
-      }).catchError((hata) {
-        setState(() {
-          result = "Google authentication hatası";
-        });
-      });
-    }).catchError((hata) {
+    }).catchError((e) {
       setState(() {
-        result =
-            "Google ile Girişde hata veya İnternet Bağlantınızı kontrol edin";
+        result = "Şifremi unuttum mailinde hata";
       });
     });
   }
