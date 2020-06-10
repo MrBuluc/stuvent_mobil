@@ -148,19 +148,6 @@ class UserModel with ChangeNotifier implements AuthBase {
     }
   }
 
-  Future<bool> emailGuncelle(String mailYeni, String uId) async {
-    try {
-      state = ViewState.Busy;
-      bool sonuc = await _userRepository.emailGuncelle(mailYeni, uId);
-      return sonuc;
-    } catch (e) {
-      print("user_model hata" + e.toString());
-      return false;
-    } finally {
-      state = ViewState.Idle;
-    }
-  }
-
   Future<String> uploadFile(
       String anaKlasor, File file, String title, String fileName) async {
     try {

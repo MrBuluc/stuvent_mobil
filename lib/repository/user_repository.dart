@@ -73,11 +73,6 @@ class UserRepository implements AuthBase {
     return await _firebaseAuthService.sifreGuncelle(password);
   }
 
-  emailGuncelle(String mailYeni, String uId) async {
-    return await _firebaseAuthService.emailGuncele(mailYeni) &&
-        await _firestoreDBService.update("Users", uId, "E-mail", mailYeni);
-  }
-
   uploadFile(
       String anaKLasor, File file, String etkinlikAdi, String fileName) async {
     return await _firebaseStorageService.uploadFile(

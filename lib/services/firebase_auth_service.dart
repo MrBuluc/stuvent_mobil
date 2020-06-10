@@ -106,24 +106,4 @@ class FirebaseAuthService implements AuthBase {
       return false;
     }
   }
-
-  emailGuncele(String mailYeni) {
-    try {
-      _firebaseAuth.currentUser().then((user) {
-        user.updateEmail(mailYeni).then((a) async {
-          return true;
-        }).catchError((e) {
-          print("E-mail Güncellenirken hata $e");
-          return false;
-        });
-      }).catchError((e) {
-        print("Kullanıcı getirilirken hata oluştu\n");
-        print("Yeni E-mail alanı boş geçilemez");
-        return false;
-      });
-    } catch (e) {
-      print("Email Güncelleme hata: " + e.toString());
-      return false;
-    }
-  }
 }

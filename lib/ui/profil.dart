@@ -107,19 +107,6 @@ class _ProfilState extends State<Profil> {
                 ),
                 RaisedButton(
                   child: Text(
-                    "E-mail Güncelle",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  onPressed: () {
-                    _emailGuncelle(context);
-                  },
-                  color: Colors.blueGrey,
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                RaisedButton(
-                  child: Text(
                     "Şifremi Güncelle",
                     style: TextStyle(color: Colors.white),
                   ),
@@ -266,43 +253,6 @@ class _ProfilState extends State<Profil> {
       return false;
     }
 
-    /*final _userModel = Provider.of<UserModel>(context);
-    bool sonuc = await _userModel.signOut();
-    return sonuc;*/
-  }
-
-  Future<void> _emailGuncelle(BuildContext context) async {
-    setState(() {
-      result = "E-mail Güncelleniyor...";
-    });
-
-    if (formKey.currentState.validate()) {
-      formKey.currentState.save();
-      UserModel _userModel = Provider.of<UserModel>(context);
-      bool sonuc = await _userModel.emailGuncelle(mailYeni, _userModel.user.userID);
-      if (sonuc) {
-        PlatformDuyarliAlertDialog(
-          baslik: "Emailiniz Güncellendi :)",
-          icerik: "Emailiniz Başarılı Bir Şekilde Güncellendi",
-          anaButonYazisi: "Tamam",
-        ).goster(context);
-        setState(() {
-          ctrl =
-              TextEditingController.fromValue(TextEditingValue(text: mailYeni));
-        });
-      } else {
-        PlatformDuyarliAlertDialog(
-          baslik: "Emailiniz Güncellenemedi :(",
-          icerik: "Emailiniz Güncellenirken Bir Sorun Oluştu",
-          anaButonYazisi: "Tamam",
-        ).goster(context);
-      }
-    } else {
-      setState(() {
-        otomatikKontrol = true;
-        result = "Girilen Bilgileri Doğru giriniz";
-      });
-    }
   }
 
   Future<void> _cikisIcinOnayIste(BuildContext context) async {
