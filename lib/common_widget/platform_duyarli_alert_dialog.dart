@@ -48,26 +48,28 @@ class PlatformDuyarliAlertDialog extends PlatformDuyarliWidget {
       if (iptalButonYazisi != null) {
         tumButonlar.add(CupertinoDialogAction(
           child: Text(iptalButonYazisi),
-          onPressed: () {},
+          onPressed: () {Navigator.of(context).pop(false);},
         ));
       }
       tumButonlar.add(CupertinoDialogAction(
         child: Text(anaButonYazisi),
         onPressed: () {
-          Navigator.pop(context);
+          Navigator.of(context).pop(true);
         },
       ));
     } else {
       if (iptalButonYazisi != null) {
         tumButonlar.add(FlatButton(
           child: Text(iptalButonYazisi),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.of(context).pop(false);
+          },
         ));
       }
       tumButonlar.add(FlatButton(
         child: Text(anaButonYazisi),
         onPressed: () {
-          Navigator.pop(context);
+          Navigator.of(context).pop(true);
         },
       ));
     }

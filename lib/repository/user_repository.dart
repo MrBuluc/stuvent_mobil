@@ -1,134 +1,107 @@
-import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:io';
 
-enum UserDurum { Idle, OturumAcilmamis, OturumAciliyor, OturumAcik }
+import 'package:stuventmobil/locator.dart';
+import 'package:stuventmobil/model/user.dart';
+import 'package:stuventmobil/services/auth_base.dart';
+import 'package:stuventmobil/services/firebase_auth_service.dart';
+import 'package:stuventmobil/services/firestore_db_service.dart';
+import "package:stuventmobil/services/firebase_storage_service.dart";
 
-class UserRepository with ChangeNotifier {
-  FirebaseAuth _auth;
-  FirebaseUser _user;
-  Firestore _firestore;
-  GoogleSignIn _googleAuth;
-  UserDurum _durum = UserDurum.Idle;
-  String uId;
+class UserRepository implements AuthBase {
+  FirebaseAuthService _firebaseAuthService = locator<FirebaseAuthService>();
+  FirestoreDBService _firestoreDBService = locator<FirestoreDBService>();
+  FirebaseStorageService _firebaseStorageService =
+      locator<FirebaseStorageService>();
 
-  UserRepository() {
-    _auth = FirebaseAuth.instance;
-    _auth.onAuthStateChanged.listen(_onAuthStateChanged);
-    _firestore = Firestore.instance;
-    _googleAuth = GoogleSignIn();
+  @override
+  Future<User> currentUser() async {
+    User _user = await _firebaseAuthService.currentUser();
+    if (_user != null)
+      return await _firestoreDBService.readUser(_user.userID);
+    else
+      return null;
   }
 
-  UserDurum get durum => _durum;
-
-  set durum(UserDurum value) {
-    _durum = value;
+  @override
+  Future<bool> signOut() async {
+    return await _firebaseAuthService.signOut();
   }
 
-  FirebaseUser get user => _user;
-
-  set user(FirebaseUser value) {
-    _user = value;
+  @override
+  Future<User> signInWithGoogle() async {
+    User _user = await _firebaseAuthService.signInWithGoogle();
+    if (_user != null) {
+      Map<String, dynamic> data = _user.toMap();
+      bool _sonuc =
+          await _firestoreDBService.setData("Users", _user.userID, data);
+      if (_sonuc) {
+        return await _firestoreDBService.readUser(_user.userID);
+      } else {
+        await _firebaseAuthService.signOut();
+        return null;
+      }
+    } else
+      return null;
   }
 
-  Future<bool> signIn(String email, String sifre) async {
-    try {
-      _durum = UserDurum.OturumAciliyor;
-      notifyListeners();
-      await _auth
-          .signInWithEmailAndPassword(email: email, password: sifre)
-          .then((u) {
-        _user = u.user;
-        uId = _user.uid;
-      });
-      return true;
-    } catch (e) {
-      debugPrint("Hata: " + e.toString());
-      _durum = UserDurum.OturumAcilmamis;
-      notifyListeners();
-      return false;
-    }
+  @override
+  Future<User> createUserWithEmailandPassword(String name, String lastname,
+      String mail, String password, bool superUser) async {
+
+    User _user = await _firebaseAuthService.createUserWithEmailandPassword(
+        name, lastname, mail, password, superUser);
+    Map<String, dynamic> data = _user.toMap();
+
+    bool _sonuc =
+        await _firestoreDBService.setData("Users", _user.userID, data);
+
+    if (_sonuc) {
+      return await _firestoreDBService.readUser(_user.userID);
+    } else
+      return null;
   }
 
-  Future<void> gSignIn() {
-    try {
-      _durum = UserDurum.OturumAciliyor;
-      notifyListeners();
-      _googleAuth.signIn().then((sonuc) {
-        sonuc.authentication.then((googleKeys) {
-          AuthCredential credential = GoogleAuthProvider.getCredential(
-              idToken: googleKeys.idToken, accessToken: googleKeys.accessToken);
+  @override
+  Future<User> signInWithEmailandPassword(String email, String sifre) async {
+    User _user =
+        await _firebaseAuthService.signInWithEmailandPassword(email, sifre);
 
-          _auth.signInWithCredential(credential).then((user) {
-            List etkinlikler = ["0"];
-
-            Map<String, dynamic> data = Map();
-            data["Ad"] = user.user.displayName;
-            data["E-mail"] = user.user.email;
-            data["UserID"] = user.user.uid;
-            data["SuperUser"] = false;
-            data["Etkinlikler"] = etkinlikler;
-
-            _firestore
-                .collection("Users")
-                .document(user.user.uid)
-                .setData(data)
-                .catchError((onError) {
-              debugPrint(
-                  "Üye Database'e Kayıt edilirken sorun oluştu $onError");
-            });
-          }).catchError((hata) {
-            debugPrint("Firebase ve google kullanıcı hatası $hata");
-          });
-        }).catchError((hata) {
-          debugPrint("Google authentication hatası $hata");
-        });
-      }).catchError((hata) {
-        debugPrint(
-            "Google ile Girişde hata veya İnternet Bağlantınızı kontrol edin $hata");
-      });
-    } catch (e) {
-      debugPrint("Hata: " + e.toString());
-      _durum = UserDurum.OturumAcilmamis;
-      notifyListeners();
-    }
+    return await _firestoreDBService.readUser(_user.userID);
   }
 
-  Future signOut() async {
-    _auth.signOut();
-    _googleAuth.signOut();
-    durum = UserDurum.OturumAcilmamis;
-    notifyListeners();
-    return Future.delayed(Duration.zero);
+  Future<bool> sifreGuncelle(String password) async {
+    return await _firebaseAuthService.sifreGuncelle(password);
   }
 
-  Future<void> _onAuthStateChanged(FirebaseUser user) async {
-    if (user == null) {
-      _durum = UserDurum.OturumAcilmamis;
+  emailGuncelle(String mailYeni, String uId) async {
+    return await _firebaseAuthService.emailGuncele(mailYeni) &&
+        await _firestoreDBService.update("Users", uId, "E-mail", mailYeni);
+  }
+
+  uploadFile(
+      String anaKLasor, File file, String etkinlikAdi, String fileName) async {
+    return await _firebaseStorageService.uploadFile(
+        anaKLasor, file, etkinlikAdi, fileName);
+  }
+
+  Future<bool> update(String collection, String documentName, String alan, dynamic map) async {
+    return await _firestoreDBService.update(collection, documentName, alan, map);
+  }
+
+  setData(String s, String event_name, Map<String, dynamic> data) async {
+    return await _firestoreDBService.setData(s, event_name, data);
+  }
+
+  /*Future<String> uploadFile(
+      String userID, String fileType, File profilFoto) async {
+    if (appMode == AppMode.DEBUG) {
+      return "dosya_indirme_linki";
     } else {
-      _user = user;
-      _durum = UserDurum.OturumAcik;
+      var profilFotoURL = await _firebaseStorageService.uploadFile(
+          userID, fileType, profilFoto);
+      await _firestoreDBService.updateProfilFoto(userID, profilFotoURL);
+      return profilFotoURL;
     }
-    notifyListeners();
-  }
+  }*/
 
-  Future<Map<String, dynamic>> read() async {
-    Map<String, dynamic> userMap = new Map();
-    await _auth.currentUser().then((user) async {
-      uId = user.uid;
-
-      DocumentSnapshot documentSnapshot =
-          await _firestore.document("Users/$uId").get();
-
-      String ad = documentSnapshot.data["Ad"];
-      String email = documentSnapshot.data["E-mail"];
-      bool superuser = documentSnapshot.data["SuperUser"];
-
-      userMap["Ad"] = ad;
-      userMap["E-mail"] = email;
-      userMap["SuperUser"] = superuser;
-    });
-    return userMap;
-  }
 }

@@ -1,9 +1,11 @@
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:provider/provider.dart';
+import 'package:stuventmobil/common_widget/platform_duyarli_alert_dialog.dart';
+import 'package:stuventmobil/viewmodel/user_model.dart';
 
 class GeneratEvent extends StatefulWidget {
   @override
@@ -15,12 +17,12 @@ class _GeneratEventState extends State<GeneratEvent> {
   int category;
   String result = "";
   final formKey = GlobalKey<FormState>();
-  final Firestore _firestore = Firestore.instance;
 
   File _secilenResim;
 
   @override
   Widget build(BuildContext context) {
+    UserModel _userModel = Provider.of<UserModel>(context);
     return Theme(
         data: Theme.of(context).copyWith(
             accentColor: Colors.green,
@@ -30,7 +32,7 @@ class _GeneratEventState extends State<GeneratEvent> {
         child: Scaffold(
           floatingActionButton: FloatingActionButton(
             onPressed: () {
-              _veriEkle();
+              _veriEkle(_userModel);
             },
             backgroundColor: Colors.teal,
             child: Icon(Icons.save),
@@ -181,13 +183,12 @@ class _GeneratEventState extends State<GeneratEvent> {
         ));
   }
 
-  _veriEkle() async {
-    if(_secilenResim == null){
+  _veriEkle(UserModel userModel) async {
+    if (_secilenResim == null) {
       setState(() {
         result = "Lütfen resim yükleyiniz!!!";
       });
-    }
-    else{
+    } else {
       setState(() {
         result = "Etkinlik oluşturuluyor...";
       });
@@ -200,7 +201,7 @@ class _GeneratEventState extends State<GeneratEvent> {
       StorageUploadTask uploadTask = ref.putFile(_secilenResim);
       url = await (await uploadTask.onComplete).ref.getDownloadURL();
 
-      List Katilimcilar = [];
+      List katilimcilar = [];
 
       List categoryList = [0];
       categoryList.add(category);
@@ -213,30 +214,33 @@ class _GeneratEventState extends State<GeneratEvent> {
       data["Etkinlik Konumu"] = location;
       data["Etkinlik Photo Url"] = url;
       data["category"] = categoryList;
-      data["Katilimcilar"] = Katilimcilar;
+      data["Katilimcilar"] = katilimcilar;
       data["Dosyalar"] = docMap;
 
-      _firestore
-          .collection("Etkinlikler")
-          .document(event_name)
-          .setData(data)
-          .then((v) {
-        setState(() {
-          result = "Etkinlik Oluşturuldu.";
-        });
-      }).catchError((onError) {
-        setState(() {
-          result = "Etkinlik Oluşturulurken sorun oluştu $onError";
-        });
-      });
+      bool sonuc = await userModel.setData("Etkinlikler", event_name, data);
+
+      if(sonuc){
+        PlatformDuyarliAlertDialog(
+          baslik: "Etkinlik Oluşturuldu",
+          icerik: "",
+          anaButonYazisi: "Tamam",
+        ).goster(context);
+      } else{
+        PlatformDuyarliAlertDialog(
+          baslik: "Etkinlik Oluşturulamadı",
+          icerik: "Etkinlik Oluşturulurken sorun oluştu",
+          anaButonYazisi: "Tamam",
+        ).goster(context);
+      }
     }
   }
 
   _galeriResimUpload() async {
-    var resim = await ImagePicker.pickImage(source: ImageSource.gallery);
+    final picker = ImagePicker();
+    var pickedFile = await picker.getImage(source: ImageSource.gallery);
 
     setState(() {
-      _secilenResim = resim;
+      _secilenResim = File(pickedFile.path);
     });
   }
 }

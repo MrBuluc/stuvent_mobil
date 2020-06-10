@@ -2,15 +2,15 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:stuventmobil/common_widget/platform_duyarli_alert_dialog.dart';
+import 'package:stuventmobil/model/user.dart';
+import 'package:stuventmobil/viewmodel/user_model.dart';
 import '../../model/event.dart';
 import 'package:stuventmobil/ui/QrCode/generate.dart';
 import 'package:stuventmobil/ui/QrCode/scan.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_document_picker/flutter_document_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class EventDetailsPage extends StatefulWidget {
   final Event event;
@@ -22,24 +22,23 @@ class EventDetailsPage extends StatefulWidget {
 }
 
 class _EventDetailsPageState extends State<EventDetailsPage> {
-  final Firestore _firestore = Firestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   bool superU = false;
   bool _pickFileInProgress = false;
-  String url;
   Map<String, dynamic> docMap;
-  List<String> docMapKeys;
+  List<String> docMapKeys = [];
   bool control = true;
 
-  @override
+  /*@override
   void initState() {
     // TODO: implement initState
     super.initState();
     superUser();
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
+    UserModel _userModel = Provider.of<UserModel>(context);
+    superUser(_userModel);
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -128,6 +127,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                       child: const Text('QR oluştur')),
                 ),
             ]),
+            if (superU)
             Padding(
               padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
               child: RaisedButton(
@@ -135,7 +135,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                 textColor: Colors.white,
                 splashColor: Colors.blueGrey,
                 onPressed: () {
-                  _pickFileInProgress ? null : _pickDocument(context);
+                  _pickFileInProgress ? null : _pickDocument(context, _userModel);
                 },
                 child: Text(
                   _pickFileInProgress ? "Dosya Yükleniyor" : "Dosya Paylaş",
@@ -148,7 +148,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     );
   }
 
-  Future<void> superUser() async {
+  Future<void> superUser(UserModel userModel) async {
+    User user = await userModel.currentUser();
     docMap = widget.event.documentsMap;
     if (docMap.isNotEmpty) {
       setState(() {
@@ -156,18 +157,12 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
         docMapKeys = docMap.keys.toList();
       });
     }
-    _auth.currentUser().then((user) async {
-      String uId = user.uid;
-      DocumentSnapshot documentSnapshot =
-          await _firestore.document("Users/${uId}").get();
-
-      setState(() {
-        superU = documentSnapshot.data["SuperUser"];
-      });
+    setState(() {
+      superU = user.superUser;
     });
   }
 
-  _pickDocument(BuildContext context) async {
+  _pickDocument(BuildContext context, UserModel userModel) async {
     String result;
     try {
       setState(() {
@@ -178,42 +173,39 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       File file = new File(result);
       String fileName = file.path.split("/").removeLast();
 
-      StorageReference ref = FirebaseStorage.instance
-          .ref()
-          .child("Etkinlikler")
-          .child(widget.event.title)
-          .child(fileName);
-      StorageUploadTask uploadTask = ref.putFile(file);
-      url = await (await uploadTask.onComplete).ref.getDownloadURL();
+      String url = await userModel.uploadFile("Etkinlikler",file, widget.event.title, fileName);
 
       docMap[fileName] = url;
 
-      _firestore
-          .collection("Etkinlikler")
-          .document(widget.event.title)
-          .updateData({"Dosyalar": docMap}).then((v) {
+      await userModel.update("Etkinlikler", widget.event.title, "Dosyalar", docMap).then((sonuc) {
+        if(sonuc == true || sonuc == null) {
+          PlatformDuyarliAlertDialog(
+            baslik: "Dosyalar Güncellendi",
+            icerik: "",
+            anaButonYazisi: "Tamam",
+          ).goster(context);
 
-        PlatformDuyarliAlertDialog(
-          baslik: "Dosyalar Güncellendi",
-          icerik: "",
-          anaButonYazisi: "Tamam",
-        ).goster(context);
-
-        setState(() {
-          control = false;
-          docMapKeys = docMap.keys.toList();
-        });
+          setState(() {
+            control = false;
+            docMapKeys = docMap.keys.toList();
+          });
+        } else{
+          PlatformDuyarliAlertDialog(
+            baslik: "Dosyalar Güncellenemedi",
+            icerik: "Dosya güncellenirken hata oluştu",
+            anaButonYazisi: "Tamam",
+          ).goster(context);
+        }
       }).catchError((onError) {
-
         PlatformDuyarliAlertDialog(
-          baslik: "Dosyalar Güncellendi",
-          icerik: onError.toString(),
+          baslik: "Dosyalar Güncellenemedi",
+          icerik: "Dosya güncellenirken hata oluştu\n"+ onError.toString(),
           anaButonYazisi: "Tamam",
         ).goster(context);
       });
     } catch (e) {
       PlatformDuyarliAlertDialog(
-        baslik: "Dosyalar Güncellendi",
+        baslik: "Dosyalar Güncellenemedi",
         icerik: e.toString(),
         anaButonYazisi: "Tamam",
       ).goster(context);

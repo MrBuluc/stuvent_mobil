@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:stuventmobil/app/exceptions.dart';
+import 'package:stuventmobil/common_widget/platform_duyarli_alert_dialog.dart';
 import 'package:stuventmobil/ui/Login/new_User.dart';
-import 'package:stuventmobil/ui/homepage/home_page.dart';
-import 'dart:io';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'file:///C:/Users/HAKKICAN/Desktop/Sifirdan%20Flutter%20ile%20Android%20ve%20Ios%20Apps%20Development/flutter%20projeleri/stuvent_hakkican/lib/repository/user_repository.dart';
+import 'package:stuventmobil/viewmodel/user_model.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -16,8 +14,6 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleAuth = GoogleSignIn();
-  final Firestore _firestore = Firestore.instance;
 
   final formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -28,7 +24,6 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-    final userRepo = Provider.of<UserRepository>(context);
     return Theme(
         data: Theme.of(context).copyWith(
             accentColor: Colors.green,
@@ -38,17 +33,8 @@ class _LoginState extends State<Login> {
         child: Scaffold(
           key: _scaffoldKey,
           floatingActionButton: FloatingActionButton(
-            onPressed: () async {
-              if (formKey.currentState.validate()) {
-                formKey.currentState.save();
-                setState(() {
-                  result = "Giriş Yapılıyor...";
-                });
-                if (!await userRepo.signIn(mail, password)) {
-                  _scaffoldKey.currentState.showSnackBar(
-                      SnackBar(content: Text("E-posta veya Şifre Hatalı")));
-                }
-              }
+            onPressed: () {
+              emailvesifregiris();
             },
             backgroundColor: Colors.teal,
             child: Icon(Icons.arrow_forward),
@@ -128,7 +114,7 @@ class _LoginState extends State<Login> {
                   child: Text("Google ile Giriş"),
                   color: Colors.red,
                   onPressed: () {
-                    userRepo.gSignIn();
+                    gSignIn(context);
                   },
                 ),
                 SizedBox(
@@ -169,5 +155,29 @@ class _LoginState extends State<Login> {
       return 'Geçersiz mail';
     else
       return null;
+  }
+
+  Future<void> gSignIn(BuildContext context) async {
+    final _userModel = Provider.of<UserModel>(context, listen: false);
+    await _userModel.signInWithGoogle();
+  }
+
+  Future<void> emailvesifregiris() async {
+    if (formKey.currentState.validate()) {
+      formKey.currentState.save();
+      setState(() {
+        result = "Giriş Yapılıyor...";
+      });
+      final _userModel = Provider.of<UserModel>(context, listen: false);
+      try {
+        await _userModel.signInWithEmailandPassword(mail, password);
+      } on PlatformException catch (e) {
+        PlatformDuyarliAlertDialog(
+          baslik: "Oturum Açma HATA",
+          icerik: Exceptions.goster(e.code),
+          anaButonYazisi: "Tamam",
+        ).goster(context);
+      }
+    }
   }
 }

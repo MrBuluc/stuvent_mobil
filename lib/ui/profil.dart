@@ -1,14 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
-import 'package:stuventmobil/ui/Login/login.dart';
+import 'package:stuventmobil/common_widget/platform_duyarli_alert_dialog.dart';
+import 'package:stuventmobil/model/user.dart';
 import 'package:stuventmobil/ui/Generate_Event/GeneratEvent.dart';
-import 'file:///C:/Users/HAKKICAN/Desktop/Sifirdan%20Flutter%20ile%20Android%20ve%20Ios%20Apps%20Development/flutter%20projeleri/stuvent_hakkican/lib/repository/user_repository.dart';
+import 'package:stuventmobil/viewmodel/user_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Profil extends StatefulWidget {
   @override
@@ -16,9 +14,7 @@ class Profil extends StatefulWidget {
 }
 
 class _ProfilState extends State<Profil> {
-  final Firestore _firestore = Firestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleAuth = GoogleSignIn();
 
   final formKey = GlobalKey<FormState>();
   TextEditingController ctrl;
@@ -37,10 +33,8 @@ class _ProfilState extends State<Profil> {
 
   @override
   Widget build(BuildContext context) {
-    final userRepo = Provider.of<UserRepository>(context);
-    userRepo.read().then(((map) {
-      read(map);
-    }));
+    UserModel _userModel = Provider.of<UserModel>(context, listen: false);
+    read(_userModel);
     return Theme(
       data: Theme.of(context).copyWith(
           accentColor: Colors.green,
@@ -117,7 +111,7 @@ class _ProfilState extends State<Profil> {
                     style: TextStyle(color: Colors.white),
                   ),
                   onPressed: () {
-                    _emailGuncelle();
+                    _emailGuncelle(context);
                   },
                   color: Colors.blueGrey,
                 ),
@@ -130,7 +124,7 @@ class _ProfilState extends State<Profil> {
                     style: TextStyle(color: Colors.white),
                   ),
                   onPressed: () {
-                    _sifremiGuncelle();
+                    _sifremiGuncelle(context);
                   },
                   color: Colors.pink,
                 ),
@@ -162,7 +156,7 @@ class _ProfilState extends State<Profil> {
                         color: Colors.black, fontWeight: FontWeight.w800),
                   ),
                   onPressed: () {
-                    userRepo.signOut();
+                    _cikisIcinOnayIste(context);
                   },
                   color: Colors.red,
                 ),
@@ -185,37 +179,53 @@ class _ProfilState extends State<Profil> {
     );
   }
 
-  void read(Map uMap) {
+  Future<void> read(UserModel userModel) async {
+    User user = await userModel.currentUser();
     setState(() {
-      name = uMap["Ad"];
-      mail = uMap["E-mail"];
-      superU = uMap["SuperUser"];
+      name = user.lastName == null ? "${user.userName}" : "${user.userName} ${user.lastName}";
+      mail = user.email;
+      superU = user.superUser;
       ctrl = TextEditingController.fromValue(TextEditingValue(text: mail));
     });
   }
 
-  Future<void> _sifremiGuncelle() async {
+  Future<void> _sifremiGuncelle(BuildContext context) async {
     setState(() {
       result = "Şifre Güncelleniyor...";
     });
 
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
+
+      UserModel _userModel = Provider.of<UserModel>(context, listen: false);
       _auth.currentUser().then((user) {
         user.updatePassword(password).then((a) async {
-          Directory directory = await getApplicationDocumentsDirectory();
-          String path = directory.path;
-          File file = File("$path/user.txt");
-          file.writeAsString("$mail-$password");
+          PlatformDuyarliAlertDialog(
+            baslik: "Şifreniz Güncellendi :)",
+            icerik: "Şifreniz Başarılı Bir Şekilde Güncellendi",
+            anaButonYazisi: "Tamam",
+          ).goster(context);
           setState(() {
             result = "Şifre Güncellendi";
           });
         }).catchError((e) {
+          PlatformDuyarliAlertDialog(
+            baslik: "Şifreniz Güncellenemedi :(",
+            icerik: "Şifreniz Güncellenirken Bir Sorun Oluştu\n" +
+                "Yeni şifreniz alanı boş geçilemez",
+            anaButonYazisi: "Tamam",
+          ).goster(context);
           setState(() {
             result = "Şifre güncellenirken hata oluştu $e";
+            _userModel.signOut();
           });
         });
       }).catchError((e) {
+        PlatformDuyarliAlertDialog(
+          baslik: "Şifreniz Güncellenemedi :(",
+          icerik: "Şifreniz Güncellenirken Bir Sorun Oluştu\n" + e.toString(),
+          anaButonYazisi: "Tamam",
+        ).goster(context);
         setState(() {
           result = "Kullanıcı getirilirken hata oluştu\n";
           result += "Yeni şifreniz alanı boş geçilemez";
@@ -239,74 +249,72 @@ class _ProfilState extends State<Profil> {
       return null;
   }
 
-  void _cikisyap() {
-    _auth.signOut().then((data) async {
-      _googleAuth.signOut();
+  Future<bool> _cikisyap(BuildContext context) async {
+    try {
+      final _googleSignIn = GoogleSignIn();
+      await _googleSignIn.signOut();
 
-      Directory directory = await getApplicationDocumentsDirectory();
-      String path = directory.path;
-      File file = File("$path/user.txt");
-      file.delete();
+      await _auth.signOut();
+      PlatformDuyarliAlertDialog(
+        baslik: "Oturumunuz Kapatıldı :(",
+        icerik: "Stuvent ı kapatıp tekrar giriş yapabilirsiniz\n"+ "Yine Bekleriz...",
+        anaButonYazisi: "Tamam",
+      ).goster(context);
+      return true;
+    } catch (e) {
+      print("sign out hata:" + e.toString());
+      return false;
+    }
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => Login()),
-      );
-    }).catchError((e) {
-      setState(() {
-        result = "Çıkış yapılırken hata oluştu";
-      });
-    });
+    /*final _userModel = Provider.of<UserModel>(context);
+    bool sonuc = await _userModel.signOut();
+    return sonuc;*/
   }
 
-  void _emailGuncelle() {
+  Future<void> _emailGuncelle(BuildContext context) async {
     setState(() {
       result = "E-mail Güncelleniyor...";
     });
 
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
-      _auth.currentUser().then((user) {
-        String uId = user.uid;
-        user.updateEmail(mailYeni).then((a) async {
-          DocumentReference reference = _firestore.document("Users/$uId");
-          _firestore.runTransaction((Transaction transaction) async {
-            await transaction.update(reference, {"E-mail": mailYeni});
-          });
-
-          Directory directory = await getApplicationDocumentsDirectory();
-          String path = directory.path;
-          File file = File("$path/user.txt");
-          try {
-            String user = await file.readAsString();
-            var arr = user.split("-");
-            password = arr[1];
-          } catch (e) {
-            setState(() {
-              result = "Dosya okumada hata";
-            });
-          }
-          file.writeAsString("$mailYeni-$password");
-
-          setState(() {
-            result = "E-mail Güncellendi";
-          });
-        }).catchError((e) {
-          setState(() {
-            result = "E-mail Güncellenirken hata $e";
-          });
-        });
-      }).catchError((e) {
+      UserModel _userModel = Provider.of<UserModel>(context);
+      bool sonuc = await _userModel.emailGuncelle(mailYeni, _userModel.user.userID);
+      if (sonuc) {
+        PlatformDuyarliAlertDialog(
+          baslik: "Emailiniz Güncellendi :)",
+          icerik: "Emailiniz Başarılı Bir Şekilde Güncellendi",
+          anaButonYazisi: "Tamam",
+        ).goster(context);
         setState(() {
-          result = "Kullanıcı getirilirken hata oluştu\n";
-          result += "Yeni E-mail alanı boş geçilemez";
+          ctrl =
+              TextEditingController.fromValue(TextEditingValue(text: mailYeni));
         });
-      });
+      } else {
+        PlatformDuyarliAlertDialog(
+          baslik: "Emailiniz Güncellenemedi :(",
+          icerik: "Emailiniz Güncellenirken Bir Sorun Oluştu",
+          anaButonYazisi: "Tamam",
+        ).goster(context);
+      }
     } else {
       setState(() {
         otomatikKontrol = true;
         result = "Girilen Bilgileri Doğru giriniz";
       });
+    }
+  }
+
+  Future<void> _cikisIcinOnayIste(BuildContext context) async {
+    final sonuc = await PlatformDuyarliAlertDialog(
+      baslik: "Emin Misiniz?",
+      icerik: "Oturumu kapatmak istediğinizden emin misiniz?",
+      anaButonYazisi: "Evet",
+      iptalButonYazisi: "Vazgeç",
+    ).goster(context);
+
+    if (sonuc) {
+      _cikisyap(context);
     }
   }
 }

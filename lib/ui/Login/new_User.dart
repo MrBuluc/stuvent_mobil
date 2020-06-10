@@ -1,7 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:stuventmobil/viewmodel/user_model.dart';
+import 'package:stuventmobil/app/exceptions.dart';
+import 'package:stuventmobil/common_widget/platform_duyarli_alert_dialog.dart';
+import 'package:stuventmobil/model/user.dart';
 
 class NewUser extends StatefulWidget {
   @override
@@ -9,16 +13,15 @@ class NewUser extends StatefulWidget {
 }
 
 class _NewUserState extends State<NewUser> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final Firestore _firestore = Firestore.instance;
   final formKey = GlobalKey<FormState>();
 
-  String name, mail, password;
+  String name,lastname, mail, password;
   String result = "";
   bool otomatikKontrol = false;
 
   @override
   Widget build(BuildContext context) {
+
     return Theme(
         data: Theme.of(context).copyWith(
             accentColor: Colors.green,
@@ -47,14 +50,27 @@ class _NewUserState extends State<NewUser> {
                 TextFormField(
                   decoration: InputDecoration(
                     prefixIcon: Icon(Icons.account_circle),
-                    hintText: "Ad ve Soyad",
+                    hintText: "Ad",
                     hintStyle: TextStyle(fontSize: 12),
-                    labelText: "Adınız ve Soyadınız",
+                    labelText: "Adınız",
                     border: OutlineInputBorder(),
                   ),
                   validator: _isimKontrol,
                   onSaved: (String value) => name = value,
-                  //onFieldSubmitted: (String value) => name = value,
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                TextFormField(
+                  decoration: InputDecoration(
+                    prefixIcon: Icon(Icons.account_circle),
+                    hintText: "Soyad",
+                    hintStyle: TextStyle(fontSize: 12),
+                    labelText: "Soyadınız",
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: _soyisimKontrol,
+                  onSaved: (String value) => lastname = value,
                 ),
                 SizedBox(
                   height: 10,
@@ -70,7 +86,6 @@ class _NewUserState extends State<NewUser> {
                   ),
                   validator: _emailKontrol,
                   onSaved: (String value) => mail = value,
-                  //onFieldSubmitted: (String value) => mail = value,
                 ),
                 SizedBox(
                   height: 10,
@@ -117,38 +132,28 @@ class _NewUserState extends State<NewUser> {
     if (formKey.currentState.validate()) {
       formKey.currentState.save();
 
-      var firebaseUser = await _auth
-          .createUserWithEmailAndPassword(email: mail, password: password)
-          .catchError((e) {
-        setState(() {
-          result = "Bu E-posta ile bir üye bulunmaktadır";
-        });
-      });
+      final _userModel = Provider.of<UserModel>(context, listen: false);
+      try{
+        User _user = await _userModel.createUserWithEmailandPassword(name, lastname, mail, password, false);
+        if(_user != null){
+          setState(() {
+            result =
+            "Üye Kayıt Edildi\n "
+                "Önceki ekrana geri dönerek E-posta ve Şifreniz ile giriş yapabilirsiniz";
+          });
+        } else{
+          setState(() {
+            result = "Üye Kayıt edilirken sorun oluştu";
+          });
+        }
+      } on PlatformException catch (e) {
+        PlatformDuyarliAlertDialog(
+          baslik: "Kullanıcı Oluşturma HATA",
+          icerik: Exceptions.goster(e.code),
+          anaButonYazisi: 'Tamam',
+        ).goster(context);
+      }
 
-      List etkinlikler = ["0"];
-
-      Map<String, dynamic> data = Map();
-      data["Ad"] = name;
-      data["E-mail"] = mail;
-      data["UserID"] = firebaseUser.user.uid;
-      data["SuperUser"] = false;
-      data["Etkinlikler"] = etkinlikler;
-
-      _firestore
-          .collection("Users")
-          .document(firebaseUser.user.uid)
-          .setData(data)
-          .then((v) {
-        setState(() {
-          result =
-              "Üye Kayıt Edildi\n "
-                  "Önceki ekrana geri dönerek E-posta ve Şifreniz ile giriş yapabilirsiniz";
-        });
-      }).catchError((onError) {
-        setState(() {
-          result = "Üye Kayıt edilirken sorun oluştu $onError";
-        });
-      });
     } else {
       setState(() {
         otomatikKontrol = true;
@@ -161,7 +166,16 @@ class _NewUserState extends State<NewUser> {
     RegExp regex = RegExp(
         "^[abcçdefgğhıijklmnoöprsştuüvyzqwxABCÇDEFGHIİJKLMNOÖPRSŞTUÜVYZQWX]+\$");
     if (!regex.hasMatch(isim))
-      return 'Isim numara içermemeli';
+      return 'Isim numara veya boşluk içermemeli';
+    else
+      return null;
+  }
+
+  String _soyisimKontrol(String soyisim) {
+    RegExp regex = RegExp(
+        "^[abcçdefgğhıijklmnoöprsştuüvyzqwxABCÇDEFGHIİJKLMNOÖPRSŞTUÜVYZQWX]+\$");
+    if (!regex.hasMatch(soyisim))
+      return 'Soyisim numara veya boşluk içermemeli';
     else
       return null;
   }

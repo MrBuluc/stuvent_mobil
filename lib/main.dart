@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stuventmobil/app/landing_page.dart';
-import 'file:///C:/Users/HAKKICAN/Desktop/Sifirdan%20Flutter%20ile%20Android%20ve%20Ios%20Apps%20Development/flutter%20projeleri/stuvent_hakkican/lib/repository/user_repository.dart';
+import 'package:stuventmobil/locator.dart';
+import 'package:stuventmobil/viewmodel/user_model.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  setupLocator();
+  runApp(MyApp());
+}
 
 class MyApp extends StatefulWidget {
   @override
@@ -13,12 +17,8 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider<UserRepository>(
-          create: (context) => UserRepository(),
-        ),
-      ],
+    return ChangeNotifierProvider(
+      create: (context) => UserModel(),
       child: MaterialApp(
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: true,
