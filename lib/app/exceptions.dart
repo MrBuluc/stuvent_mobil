@@ -10,8 +10,11 @@ class Exceptions {
       case 'ERROR_ACCOUNT_EXISTS_WITH_DIFFERENT_CREDENTIAL':
         return "Facebook hesabınızdaki mail adresi daha önce gmail veya email yöntemi ile sisteme kaydedilmiştir. Lütfen bu mail adresi ile giriş yapın";
 
+      case "ERROR_NETWORK_REQUEST_FAILED":
+        return "İnternet bağlantınızı kontrol edin";
+
       default:
-        return "Bir hata olustu";
+        return "Bir hata olustu $hataKodu";
     }
   }
 }

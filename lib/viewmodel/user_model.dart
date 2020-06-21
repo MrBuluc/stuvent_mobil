@@ -178,13 +178,10 @@ class UserModel with ChangeNotifier implements AuthBase {
   Future<bool> setData(
       String s, String eventname, Map<String, dynamic> data) async {
     try {
-      state = ViewState.Busy;
       bool sonuc = await _userRepository.setData(s, eventname, data);
       return sonuc;
     } catch (e) {
       print("user_model hata: " + e.toString());
-    } finally {
-      state = ViewState.Idle;
     }
   }
 }

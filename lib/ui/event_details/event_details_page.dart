@@ -28,13 +28,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   List<String> docMapKeys = [];
   bool control = true;
 
-  /*@override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    superUser();
-  }*/
-
   @override
   Widget build(BuildContext context) {
     UserModel _userModel = Provider.of<UserModel>(context);

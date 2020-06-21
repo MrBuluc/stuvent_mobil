@@ -192,14 +192,12 @@ class _GeneratEventState extends State<GeneratEvent> {
       setState(() {
         result = "Etkinlik oluşturuluyor...";
       });
-
-      StorageReference ref = FirebaseStorage.instance
+      formKey.currentState.save();
+      StorageReference _storageReference = FirebaseStorage.instance
           .ref()
-          .child("Etkinlikler")
-          .child(event_name)
-          .child("event_photo.png");
-      StorageUploadTask uploadTask = ref.putFile(_secilenResim);
-      url = await (await uploadTask.onComplete).ref.getDownloadURL();
+          .child("Etkinlikler/$event_name/event_photo.png");
+      StorageUploadTask uploadTask = _storageReference.putFile(_secilenResim);
+      var url = await (await uploadTask.onComplete).ref.getDownloadURL();
 
       List katilimcilar = [];
 
@@ -222,7 +220,7 @@ class _GeneratEventState extends State<GeneratEvent> {
       if (sonuc) {
         PlatformDuyarliAlertDialog(
           baslik: "Etkinlik Oluşturuldu",
-          icerik: "",
+          icerik: "Etkinlik Başarıyla Oluşturuldu",
           anaButonYazisi: "Tamam",
         ).goster(context);
       } else {

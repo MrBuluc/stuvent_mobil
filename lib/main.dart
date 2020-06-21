@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stuventmobil/app/landing_page.dart';
 import 'package:stuventmobil/locator.dart';
-import 'package:stuventmobil/services/firebase_auth_service.dart';
 import 'package:stuventmobil/viewmodel/user_model.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
