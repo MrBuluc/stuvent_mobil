@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 32.0),
                         child: Text(
-                          "Çevrendeki Etkinliklere Gözat 🔋",
+                          "Çevrendeki Etkinliklere Gözat 🥳",
                           style: whiteHeadingTextStyle,
                           textAlign: TextAlign.center,
                         ),
