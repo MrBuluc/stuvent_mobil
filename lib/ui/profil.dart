@@ -236,21 +236,22 @@ class _ProfilState extends State<Profil> {
       return null;
   }
 
-  Future<bool> _cikisyap(BuildContext context) async {
+  Future<void> _cikisyap(BuildContext context) async {
     try {
       final _googleSignIn = GoogleSignIn();
       await _googleSignIn.signOut();
 
       await _auth.signOut();
-      PlatformDuyarliAlertDialog(
+      final sonuc = await PlatformDuyarliAlertDialog(
         baslik: "Oturumunuz Kapatıldı :(",
-        icerik: "Stuvent ı kapatıp tekrar giriş yapabilirsiniz\n"+ "Yine Bekleriz...",
+        icerik: "Oturumunuz başarıyla kapatıldı\n"+ "Yine Bekleriz...",
         anaButonYazisi: "Tamam",
       ).goster(context);
-      return true;
+      if(sonuc){
+        Navigator.pop(context);
+      }
     } catch (e) {
       print("sign out hata:" + e.toString());
-      return false;
     }
 
   }
