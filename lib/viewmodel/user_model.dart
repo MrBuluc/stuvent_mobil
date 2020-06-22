@@ -32,7 +32,6 @@ class UserModel with ChangeNotifier implements AuthBase {
   @override
   Future<User> currentUser() async {
     try {
-      //state = ViewState.Busy;
       _user = await _userRepository.currentUser();
       if (_user != null)
         return _user;
@@ -181,6 +180,16 @@ class UserModel with ChangeNotifier implements AuthBase {
       bool sonuc = await _userRepository.setData(s, eventname, data);
       return sonuc;
     } catch (e) {
+      print("user_model hata: " + e.toString());
+    }
+  }
+
+  Future<bool> eventDel(String document) async {
+    try{
+      bool sonuc = await _userRepository.eventDel(document);
+      return sonuc;
+    }
+    catch (e) {
       print("user_model hata: " + e.toString());
     }
   }

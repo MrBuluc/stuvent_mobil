@@ -6,8 +6,6 @@ import 'package:stuventmobil/services/database_base.dart';
 class FirestoreDBService implements DBBase {
   final Firestore _firebaseDB = Firestore.instance;
 
-
-
   @override
   Future<User> readUser(String userID) async {
     DocumentSnapshot _okunanUser =
@@ -19,14 +17,15 @@ class FirestoreDBService implements DBBase {
     return _okunanUserNesnesi;
   }
 
-  Future<bool> update(String collection, String documentName, String alan, dynamic newData) async {
+  Future<bool> update(String collection, String documentName, String alan,
+      dynamic newData) async {
     await _firebaseDB
         .collection(collection)
         .document(documentName)
         .updateData({alan: newData}).then((value) {
-          return true;
+      return true;
     }).catchError((onError) {
-      print("db_service update hata: "+ onError.toString());
+      print("db_service update hata: " + onError.toString());
       return false;
     });
   }
@@ -41,12 +40,28 @@ class FirestoreDBService implements DBBase {
   }
 
   @override
-  Future<bool> setData(String collection, String document, Map<String, dynamic> map) async {
-    await _firebaseDB.collection(collection).document(document).setData(map).catchError((onError) {
-      print("db setData hata: "+ onError.toString());
+  Future<bool> setData(
+      String collection, String document, Map<String, dynamic> map) async {
+    await _firebaseDB
+        .collection(collection)
+        .document(document)
+        .setData(map)
+        .catchError((onError) {
+      print("db setData hata: " + onError.toString());
     });
     return true;
   }
 
-
+  @override
+  Future<bool> eventDel(String document) async {
+    await _firebaseDB
+        .collection("Etkinlikler")
+        .document(document)
+        .delete()
+        .catchError((onError) {
+      print("db setData hata: " + onError.toString());
+      return false;
+    });
+    return true;
+  }
 }

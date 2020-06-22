@@ -104,7 +104,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               ),
               if (superU)
                 Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                   child: RaisedButton(
                       color: Color(0xFFFF4700),
                       textColor: Colors.white,
@@ -119,22 +119,37 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                       },
                       child: const Text('QR oluştur')),
                 ),
+              if (superU)
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                  child: RaisedButton(
+                      color: Colors.red,
+                      textColor: Colors.white,
+                      splashColor: Colors.black,
+                      onPressed: () {
+                        _silmekIcinOnayIste(
+                            context, _userModel, widget.event.title);
+                      },
+                      child: const Text('Etkinliği Kaldır')),
+                ),
             ]),
             if (superU)
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              child: RaisedButton(
-                color: _pickFileInProgress ? Colors.grey : Colors.green,
-                textColor: Colors.white,
-                splashColor: Colors.blueGrey,
-                onPressed: () {
-                  _pickFileInProgress ? null : _pickDocument(context, _userModel);
-                },
-                child: Text(
-                  _pickFileInProgress ? "Dosya Yükleniyor" : "Dosya Paylaş",
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                child: RaisedButton(
+                  color: _pickFileInProgress ? Colors.grey : Colors.green,
+                  textColor: Colors.white,
+                  splashColor: Colors.blueGrey,
+                  onPressed: () {
+                    _pickFileInProgress
+                        ? null
+                        : _pickDocument(context, _userModel);
+                  },
+                  child: Text(
+                    _pickFileInProgress ? "Dosya Yükleniyor" : "Dosya Paylaş",
+                  ),
                 ),
-              ),
-            )
+              )
           ],
         ),
       ),
@@ -166,12 +181,15 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       File file = new File(result);
       String fileName = file.path.split("/").removeLast();
 
-      String url = await userModel.uploadFile("Etkinlikler",file, widget.event.title, fileName);
+      String url = await userModel.uploadFile(
+          "Etkinlikler", file, widget.event.title, fileName);
 
       docMap[fileName] = url;
 
-      await userModel.update("Etkinlikler", widget.event.title, "Dosyalar", docMap).then((sonuc) {
-        if(sonuc == true || sonuc == null) {
+      await userModel
+          .update("Etkinlikler", widget.event.title, "Dosyalar", docMap)
+          .then((sonuc) {
+        if (sonuc == true || sonuc == null) {
           PlatformDuyarliAlertDialog(
             baslik: "Dosyalar Güncellendi",
             icerik: "",
@@ -182,7 +200,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             control = false;
             docMapKeys = docMap.keys.toList();
           });
-        } else{
+        } else {
           PlatformDuyarliAlertDialog(
             baslik: "Dosyalar Güncellenemedi",
             icerik: "Dosya güncellenirken hata oluştu",
@@ -192,7 +210,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       }).catchError((onError) {
         PlatformDuyarliAlertDialog(
           baslik: "Dosyalar Güncellenemedi",
-          icerik: "Dosya güncellenirken hata oluştu\n"+ onError.toString(),
+          icerik: "Dosya güncellenirken hata oluştu\n" + onError.toString(),
           anaButonYazisi: "Tamam",
         ).goster(context);
       });
@@ -206,6 +224,50 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       setState(() {
         _pickFileInProgress = false;
       });
+    }
+  }
+
+  Future<void> _silmekIcinOnayIste(
+      BuildContext context, UserModel userModel, String document) async {
+    final sonuc = await PlatformDuyarliAlertDialog(
+      baslik: "Emin Misiniz?",
+      icerik: "Etkinliği Kaldırmak istediğinizden emin misiniz?",
+      anaButonYazisi: "Evet",
+      iptalButonYazisi: "Vazgeç",
+    ).goster(context);
+
+    if (sonuc) {
+      _eventDel(context, userModel, document);
+    }
+  }
+
+  Future<void> _eventDel(
+      BuildContext context, UserModel userModel, String document) async {
+    try {
+      bool sonuc = await userModel.eventDel(document);
+      print("Sonuc: $sonuc");
+      if (sonuc == true || sonuc == null) {
+        final sonuc1 = await PlatformDuyarliAlertDialog(
+          baslik: "Etkinlik Kaldırıldı",
+          icerik: "Etkinlik başarıyla kaldırıldı",
+          anaButonYazisi: "Tamam",
+        ).goster(context);
+        if (sonuc1) {
+          Navigator.pop(context);
+        }
+      } else {
+        PlatformDuyarliAlertDialog(
+          baslik: "Etkinlik Kaldırılırken Sorun",
+          icerik: "Etkinlik kaldırılırken bir sorun oluştu ",
+          anaButonYazisi: "Tamam",
+        ).goster(context);
+      }
+    } catch (e) {
+      PlatformDuyarliAlertDialog(
+        baslik: "Etkinlik Kaldırılırken Sorun",
+        icerik: "Etkinlik kaldırılırken bir sorun oluştu: $e ",
+        anaButonYazisi: "Tamam",
+      ).goster(context);
     }
   }
 }

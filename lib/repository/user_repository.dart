@@ -87,6 +87,10 @@ class UserRepository implements AuthBase {
     return await _firestoreDBService.setData(s, event_name, data);
   }
 
+  Future<bool> eventDel(String document) async {
+    return await _firestoreDBService.eventDel(document);
+  }
+
   /*Future<String> uploadFile(
       String userID, String fileType, File profilFoto) async {
     if (appMode == AppMode.DEBUG) {
