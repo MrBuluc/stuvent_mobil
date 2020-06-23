@@ -193,4 +193,14 @@ class UserModel with ChangeNotifier implements AuthBase {
       print("user_model hata: " + e.toString());
     }
   }
+
+  Future<List<String>> getEtkinlikler() async {
+    try{
+      List<String> etkinlikler = await _userRepository.getEtkinlikler();
+      return etkinlikler;
+    }
+    catch(e){
+      print("user_model hata: " + e.toString());
+    }
+  }
 }

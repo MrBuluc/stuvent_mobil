@@ -17,9 +17,8 @@ class _ProfilState extends State<Profil> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   final formKey = GlobalKey<FormState>();
-  TextEditingController ctrl;
 
-  String name = "", mail = "", mailYeni, password;
+  String name = "", mail = "", password;
   String result = "";
   bool superU = false;
   bool otomatikKontrol = false;
@@ -27,7 +26,6 @@ class _ProfilState extends State<Profil> {
   @override
   void dispose() {
     // TODO: implement dispose
-    ctrl.dispose();
     super.dispose();
   }
 
@@ -55,32 +53,26 @@ class _ProfilState extends State<Profil> {
                 SizedBox(
                   height: 10,
                 ),
-                Row(
+                Column(
                   children: <Widget>[
                     Text(
                       "İsim:",
                       style: TextStyle(fontSize: 20, color: Color(0xffAA00AA)),
                     ),
-                    SizedBox(width: 10),
                     Text(
                       name,
                       style: TextStyle(fontSize: 20),
                     ),
+                    SizedBox(height: 10),
+                    Text(
+                      "E-posta:",
+                      style: TextStyle(fontSize: 20, color: Color(0xffAA00AA)),
+                    ),
+                    Text(
+                      mail,
+                      style: TextStyle(fontSize: 20),
+                    ),
                   ],
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                TextFormField(
-                  keyboardType: TextInputType.emailAddress,
-                  controller: ctrl,
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.mail),
-                    labelText: "E-posta adresiniz",
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: _emailKontrol,
-                  onSaved: (String value) => mailYeni = value,
                 ),
                 SizedBox(
                   height: 10,
@@ -93,7 +85,6 @@ class _ProfilState extends State<Profil> {
                     labelText: "Yeni Şifreniz",
                     border: OutlineInputBorder(),
                   ),
-                  initialValue: "123456",
                   validator: (String value) {
                     if (value.length < 6) {
                       return "En az 6 karakter gerekli";
@@ -169,10 +160,11 @@ class _ProfilState extends State<Profil> {
   Future<void> read(UserModel userModel) async {
     User user = await userModel.currentUser();
     setState(() {
-      name = user.lastName == null ? "${user.userName}" : "${user.userName} ${user.lastName}";
+      name = user.lastName == null
+          ? "${user.userName}"
+          : "${user.userName} ${user.lastName}";
       mail = user.email;
       superU = user.superUser;
-      ctrl = TextEditingController.fromValue(TextEditingValue(text: mail));
     });
   }
 
@@ -199,7 +191,8 @@ class _ProfilState extends State<Profil> {
           PlatformDuyarliAlertDialog(
             baslik: "Şifreniz Güncellenemedi :(",
             icerik: "Şifreniz Güncellenirken Bir Sorun Oluştu\n" +
-                "Yeni şifreniz alanı boş geçilemez",
+                "Yeni şifreniz alanı boş geçilemez\n" +
+                "$e",
             anaButonYazisi: "Tamam",
           ).goster(context);
           setState(() {
@@ -226,16 +219,6 @@ class _ProfilState extends State<Profil> {
     }
   }
 
-  String _emailKontrol(String value) {
-    Pattern pattern =
-        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-    RegExp regex = new RegExp(pattern);
-    if (!regex.hasMatch(mail))
-      return 'Geçersiz mail';
-    else
-      return null;
-  }
-
   Future<void> _cikisyap(BuildContext context) async {
     try {
       final _googleSignIn = GoogleSignIn();
@@ -244,16 +227,15 @@ class _ProfilState extends State<Profil> {
       await _auth.signOut();
       final sonuc = await PlatformDuyarliAlertDialog(
         baslik: "Oturumunuz Kapatıldı :(",
-        icerik: "Oturumunuz başarıyla kapatıldı\n"+ "Yine Bekleriz...",
+        icerik: "Oturumunuz başarıyla kapatıldı\n" + "Yine Bekleriz...",
         anaButonYazisi: "Tamam",
       ).goster(context);
-      if(sonuc){
+      if (sonuc) {
         Navigator.pop(context);
       }
     } catch (e) {
       print("sign out hata:" + e.toString());
     }
-
   }
 
   Future<void> _cikisIcinOnayIste(BuildContext context) async {

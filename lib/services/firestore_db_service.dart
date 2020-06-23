@@ -9,7 +9,7 @@ class FirestoreDBService implements DBBase {
   @override
   Future<User> readUser(String userID) async {
     DocumentSnapshot _okunanUser =
-        await _firebaseDB.collection("Users").document(userID).get();
+    await _firebaseDB.collection("Users").document(userID).get();
     Map<String, dynamic> _okunanUserBilgileriMap = _okunanUser.data;
 
     User _okunanUserNesnesi = User.userfromMap(_okunanUserBilgileriMap);
@@ -40,8 +40,8 @@ class FirestoreDBService implements DBBase {
   }
 
   @override
-  Future<bool> setData(
-      String collection, String document, Map<String, dynamic> map) async {
+  Future<bool> setData(String collection, String document,
+      Map<String, dynamic> map) async {
     await _firebaseDB
         .collection(collection)
         .document(document)
@@ -63,5 +63,19 @@ class FirestoreDBService implements DBBase {
       return false;
     });
     return true;
+  }
+
+  Future<List<String>> getEtkinlikler() async {
+    QuerySnapshot querySnapshot =
+    await _firebaseDB.collection("Etkinlikler").getDocuments();
+
+    List<DocumentSnapshot> documentSnapshotList = querySnapshot.documents;
+
+    List<String> etkinlikler = [];
+    documentSnapshotList.forEach((documentSnapshot) {
+      etkinlikler.add(documentSnapshot.data["Etkinlik Adı"]);
+    });
+
+    return etkinlikler;
   }
 }

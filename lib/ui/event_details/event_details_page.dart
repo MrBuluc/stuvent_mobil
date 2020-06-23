@@ -191,8 +191,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
           .then((sonuc) {
         if (sonuc == true || sonuc == null) {
           PlatformDuyarliAlertDialog(
-            baslik: "Dosyalar Güncellendi",
-            icerik: "",
+            baslik: "Dosya Eklendi",
+            icerik: "Dosya başarılı bir şekilde eklendi",
             anaButonYazisi: "Tamam",
           ).goster(context);
 
@@ -245,7 +245,6 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
       BuildContext context, UserModel userModel, String document) async {
     try {
       bool sonuc = await userModel.eventDel(document);
-      print("Sonuc: $sonuc");
       if (sonuc == true || sonuc == null) {
         final sonuc1 = await PlatformDuyarliAlertDialog(
           baslik: "Etkinlik Kaldırıldı",

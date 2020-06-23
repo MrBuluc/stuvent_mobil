@@ -17,12 +17,14 @@ class _GeneratEventState extends State<GeneratEvent> {
   int category;
   String result = "";
   final formKey = GlobalKey<FormState>();
+  List<String> etkinlikler = [];
 
   File _secilenResim;
 
   @override
   Widget build(BuildContext context) {
     UserModel _userModel = Provider.of<UserModel>(context);
+    getEtkinlikler(_userModel);
     return Theme(
         data: Theme.of(context).copyWith(
             accentColor: Colors.green,
@@ -57,8 +59,14 @@ class _GeneratEventState extends State<GeneratEvent> {
                       labelText: "Etkinliğin Adı",
                       border: OutlineInputBorder(),
                     ),
+                    validator: (String value) {
+                      if(etkinlikler.contains(value)){
+                        return "Bu etkinlik bulunmaktadır";
+                      }
+                      else
+                        return null;
+                    },
                     onSaved: (String value) => event_name = value,
-                    onFieldSubmitted: (String value) => event_name = value,
                   ),
                   SizedBox(
                     height: 10,
@@ -192,47 +200,50 @@ class _GeneratEventState extends State<GeneratEvent> {
       setState(() {
         result = "Etkinlik oluşturuluyor...";
       });
-      formKey.currentState.save();
-      StorageReference _storageReference = FirebaseStorage.instance
-          .ref()
-          .child("Etkinlikler/$event_name/event_photo.png");
-      StorageUploadTask uploadTask = _storageReference.putFile(_secilenResim);
-      var url = await (await uploadTask.onComplete).ref.getDownloadURL();
+      if(formKey.currentState.validate()){
+        formKey.currentState.save();
+        StorageReference _storageReference = FirebaseStorage.instance
+            .ref()
+            .child("Etkinlikler/$event_name/event_photo.png");
+        StorageUploadTask uploadTask = _storageReference.putFile(_secilenResim);
+        var url = await (await uploadTask.onComplete).ref.getDownloadURL();
 
-      List katilimcilar = [];
+        List katilimcilar = [];
 
-      List categoryList = [0];
-      categoryList.add(category);
+        List categoryList = [0];
+        categoryList.add(category);
 
-      Map<String, dynamic> docMap = {};
+        Map<String, dynamic> docMap = {};
 
-      formKey.currentState.save();
-      Map<String, dynamic> data = Map();
-      data["Etkinlik Adı"] = event_name;
-      data["Etkinlik Konumu"] = location;
-      data["Etkinlik Photo Url"] = url;
-      data["category"] = categoryList;
-      data["Katilimcilar"] = katilimcilar;
-      data["Dosyalar"] = docMap;
+        formKey.currentState.save();
+        Map<String, dynamic> data = Map();
+        data["Etkinlik Adı"] = event_name;
+        data["Etkinlik Konumu"] = location;
+        data["Etkinlik Photo Url"] = url;
+        data["category"] = categoryList;
+        data["Katilimcilar"] = katilimcilar;
+        data["Dosyalar"] = docMap;
 
-      bool sonuc = await userModel.setData("Etkinlikler", event_name, data);
+        bool sonuc = await userModel.setData("Etkinlikler", event_name, data);
 
-      if (sonuc) {
-        final sonuc1 = await PlatformDuyarliAlertDialog(
-          baslik: "Etkinlik Oluşturuldu",
-          icerik: "Etkinlik Başarıyla Oluşturuldu",
-          anaButonYazisi: "Tamam",
-        ).goster(context);
-        if(sonuc1){
-          Navigator.pop(context);
+        if (sonuc) {
+          final sonuc1 = await PlatformDuyarliAlertDialog(
+            baslik: "Etkinlik Oluşturuldu",
+            icerik: "Etkinlik Başarıyla Oluşturuldu",
+            anaButonYazisi: "Tamam",
+          ).goster(context);
+          if(sonuc1){
+            Navigator.pop(context);
+          }
+        } else {
+          PlatformDuyarliAlertDialog(
+            baslik: "Etkinlik Oluşturulamadı",
+            icerik: "Etkinlik Oluşturulurken sorun oluştu",
+            anaButonYazisi: "Tamam",
+          ).goster(context);
         }
-      } else {
-        PlatformDuyarliAlertDialog(
-          baslik: "Etkinlik Oluşturulamadı",
-          icerik: "Etkinlik Oluşturulurken sorun oluştu",
-          anaButonYazisi: "Tamam",
-        ).goster(context);
       }
+
     }
   }
 
@@ -243,5 +254,9 @@ class _GeneratEventState extends State<GeneratEvent> {
     setState(() {
       _secilenResim = File(pickedFile.path);
     });
+  }
+
+  Future<void> getEtkinlikler(UserModel userModel) async {
+    etkinlikler = await userModel.getEtkinlikler();
   }
 }

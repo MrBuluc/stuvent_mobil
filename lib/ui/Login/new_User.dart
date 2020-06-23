@@ -15,13 +15,12 @@ class NewUser extends StatefulWidget {
 class _NewUserState extends State<NewUser> {
   final formKey = GlobalKey<FormState>();
 
-  String name,lastname, mail, password;
+  String name, lastname, mail, password;
   String result = "";
   bool otomatikKontrol = false;
 
   @override
   Widget build(BuildContext context) {
-
     return Theme(
         data: Theme.of(context).copyWith(
             accentColor: Colors.green,
@@ -133,15 +132,15 @@ class _NewUserState extends State<NewUser> {
       formKey.currentState.save();
 
       final _userModel = Provider.of<UserModel>(context, listen: false);
-      try{
-        User _user = await _userModel.createUserWithEmailandPassword(name, lastname, mail, password, false);
-        if(_user != null){
+      try {
+        User _user = await _userModel.createUserWithEmailandPassword(
+            name, lastname, mail, password, false);
+        if (_user != null) {
           setState(() {
-            result =
-            "Üye Kayıt Edildi\n "
+            result = "Üye Kayıt Edildi\n "
                 "Önceki ekrana geri dönerek E-posta ve Şifreniz ile giriş yapabilirsiniz";
           });
-        } else{
+        } else {
           setState(() {
             result = "Üye Kayıt edilirken sorun oluştu";
           });
@@ -153,7 +152,6 @@ class _NewUserState extends State<NewUser> {
           anaButonYazisi: 'Tamam',
         ).goster(context);
       }
-
     } else {
       setState(() {
         otomatikKontrol = true;

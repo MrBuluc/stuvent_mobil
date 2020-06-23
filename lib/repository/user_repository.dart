@@ -91,6 +91,10 @@ class UserRepository implements AuthBase {
     return await _firestoreDBService.eventDel(document);
   }
 
+  Future<List<String>> getEtkinlikler() async {
+    return await _firestoreDBService.getEtkinlikler();
+  }
+
   /*Future<String> uploadFile(
       String userID, String fileType, File profilFoto) async {
     if (appMode == AppMode.DEBUG) {
