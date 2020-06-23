@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:barcode_scan/barcode_scan.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:stuventmobil/viewmodel/user_model.dart';
 import 'package:provider/provider.dart';
+import 'package:stuventmobil/viewmodel/user_model.dart';
+import 'package:stuventmobil/common_widget/platform_duyarli_alert_dialog.dart';
+import 'package:stuventmobil/app/exceptions.dart';
 
 class ScanScreen extends StatefulWidget {
   @override
@@ -13,8 +13,6 @@ class ScanScreen extends StatefulWidget {
 }
 
 class _ScanState extends State<ScanScreen> {
-  final Firestore _firestore = Firestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   String barcode = "";
   String result = "";
 
@@ -31,7 +29,7 @@ class _ScanState extends State<ScanScreen> {
     ..removeWhere((e) => e == BarcodeFormat.unknown);
   List<BarcodeFormat> selectedFormats = [..._possibleFormats];
 
-  Future _scanQR() async {
+  Future<void> _scanQR(BuildContext context ,UserModel userModel) async {
     try {
       var options = ScanOptions(
         strings: {
@@ -76,40 +74,37 @@ class _ScanState extends State<ScanScreen> {
       result = "Yoklama alınıyor...";
     });
 
-    _auth.currentUser().then(((user) {
-      String uId = user.uid;
-      final DocumentReference eventRef = _firestore.document("Users/$uId");
-
-      List etkinlik;
-      _firestore.runTransaction((Transaction transaction) async {
-        DocumentSnapshot eventData = await eventRef.get();
-        etkinlik = eventData.data["Etkinlikler"];
-        etkinlik.add(barcode);
-        await transaction
-            .update(eventRef, {"Etkinlikler": etkinlik}).then((onValue) {
-          setState(() {
-            result = "Yoklama alındı";
-          });
-        }).catchError((onError) {
-          setState(() {
-            result = "Yoklama alınırken sorun oluştu";
-          });
+    try{
+      bool sonuc = await userModel.yoklamaAl(userModel.user.userID, barcode);
+      if (sonuc== true || sonuc == null) {
+        PlatformDuyarliAlertDialog(
+          baslik: "Yoklama Alındı",
+          icerik: "Yoklama başarılı bir şekilde alındı",
+          anaButonYazisi: "Tamam",
+        ).goster(context);
+        setState(() {
+          result = "Yoklama Alındı";
         });
-      });
-    })).catchError((e) {
-      setState(() {
-        result = "Kullanıcı getirilirken hata oluştu";
-      });
-    });
-  }
-
-  @override
-  initState() {
-    super.initState();
+      } else {
+        PlatformDuyarliAlertDialog(
+          baslik: "Yoklama Alınamadı :(",
+          icerik: "Yoklama alınırken bir sorun oluştu.\n" +
+              "İnternet bağlantınızı kontrol edin.",
+          anaButonYazisi: "Tamam",
+        ).goster(context);
+      }
+    }on PlatformException catch (e) {
+      PlatformDuyarliAlertDialog(
+        baslik: "Yoklama Alma HATA",
+        icerik: Exceptions.goster(e.code),
+        anaButonYazisi: 'Tamam',
+      ).goster(context);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    UserModel _userModel = Provider.of<UserModel>(context);
     return Scaffold(
         appBar: AppBar(
           title: Text('Yoklama'),
@@ -125,7 +120,9 @@ class _ScanState extends State<ScanScreen> {
                     color: Colors.blue,
                     textColor: Colors.white,
                     splashColor: Colors.blueGrey,
-                    onPressed: _scanQR,
+                    onPressed: () {
+                      _scanQR(context ,_userModel);
+                    },
                     child: const Text('START CAMERA SCAN')),
               ),
               Padding(

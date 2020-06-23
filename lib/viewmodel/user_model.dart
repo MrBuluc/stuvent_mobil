@@ -213,4 +213,14 @@ class UserModel with ChangeNotifier implements AuthBase {
       print("user_model hata: " + e.toString());
     }
   }
+
+  Future<bool> yoklamaAl(String userID, String eventName) async {
+    try{
+      bool sonuc = await _userRepository.yoklamaAl(userID, eventName);
+      return sonuc;
+    }
+    catch (e) {
+      print("user_model hata: " + e.toString());
+    }
+  }
 }

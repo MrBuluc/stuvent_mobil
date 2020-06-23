@@ -78,4 +78,21 @@ class FirestoreDBService implements DBBase {
 
     return etkinlikler;
   }
+
+  Future<bool> yoklamaAl(String userID, String eventName) {
+    final DocumentReference eventRef = _firebaseDB.document("Users/$userID");
+
+    List etkinlik;
+    _firebaseDB.runTransaction((Transaction transaction) async {
+      DocumentSnapshot eventData = await eventRef.get();
+      etkinlik = eventData.data["Etkinlikler"];
+      etkinlik.add(eventName);
+      await transaction
+          .update(eventRef, {"Etkinlikler": etkinlik}).then((onValue) {
+            return true;
+      }).catchError((onError) {
+        return false;
+      });
+    });
+  }
 }

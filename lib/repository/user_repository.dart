@@ -99,6 +99,10 @@ class UserRepository implements AuthBase {
     return await _firebaseAuthService.sendPasswordResetEmail(mail);
   }
 
+  Future<bool> yoklamaAl(String userID, String eventName) async {
+    return await _firestoreDBService.yoklamaAl(userID, eventName);
+  }
+
   /*Future<String> uploadFile(
       String userID, String fileType, File profilFoto) async {
     if (appMode == AppMode.DEBUG) {
