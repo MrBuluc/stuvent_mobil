@@ -124,29 +124,6 @@ class UserModel with ChangeNotifier implements AuthBase {
     return sonuc;
   }
 
-  /*Future<String> uploadFile(
-      String userID, String fileType, File profilFoto) async {
-    var indirmeLinki =
-    await _userRepository.uploadFile(userID, fileType, profilFoto);
-    return indirmeLinki;
-  }*/
-
-  Future<bool> sifreGuncelle(String password) async {
-    try {
-      state = ViewState.Busy;
-      await _userRepository.sifreGuncelle(password).then((sonuc) {
-        return sonuc;
-      }).catchError((onError) {
-        print("user_model hata: "+ onError.toString());
-      });
-    } catch (e) {
-      print("user_model hata" + e.toString());
-      return false;
-    } finally {
-      state = ViewState.Idle;
-    }
-  }
-
   Future<String> uploadFile(
       String anaKlasor, File file, String etkinlikAdi, String fileName) async {
     try {
@@ -217,6 +194,16 @@ class UserModel with ChangeNotifier implements AuthBase {
   Future<bool> yoklamaAl(String userID, String eventName) async {
     try{
       bool sonuc = await _userRepository.yoklamaAl(userID, eventName);
+      return sonuc;
+    }
+    catch (e) {
+      print("user_model hata: " + e.toString());
+    }
+  }
+
+  Future<bool> updatePassword(String password) async {
+    try{
+      bool sonuc = await _userRepository.updatePassword(password);
       return sonuc;
     }
     catch (e) {

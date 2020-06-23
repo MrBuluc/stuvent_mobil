@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
+import 'package:stuventmobil/app/exceptions.dart';
 import 'package:stuventmobil/common_widget/platform_duyarli_alert_dialog.dart';
 import 'package:stuventmobil/model/user.dart';
 import 'package:stuventmobil/ui/Generate_Event/GeneratEvent.dart';
@@ -177,8 +179,9 @@ class _ProfilState extends State<Profil> {
       formKey.currentState.save();
 
       UserModel _userModel = Provider.of<UserModel>(context, listen: false);
-      _auth.currentUser().then((user) {
-        user.updatePassword(password).then((a) async {
+      try{
+        bool sonuc = await _userModel.updatePassword(password);
+        if (sonuc== true || sonuc == null) {
           PlatformDuyarliAlertDialog(
             baslik: "Şifreniz Güncellendi :)",
             icerik: "Şifreniz Başarılı Bir Şekilde Güncellendi",
@@ -187,30 +190,29 @@ class _ProfilState extends State<Profil> {
           setState(() {
             result = "Şifre Güncellendi";
           });
-        }).catchError((e) {
-          PlatformDuyarliAlertDialog(
+        } else {
+          final sonuc = await PlatformDuyarliAlertDialog(
             baslik: "Şifreniz Güncellenemedi :(",
             icerik: "Şifreniz Güncellenirken Bir Sorun Oluştu\n" +
                 "Yeni şifreniz alanı boş geçilemez\n" +
-                "$e",
+                "Tekrar giriş yapmanız gerekiyor",
             anaButonYazisi: "Tamam",
           ).goster(context);
           setState(() {
-            result = "Şifre güncellenirken hata oluştu $e";
+            result = "Şifre güncellenirken hata oluştu";
             _userModel.signOut();
           });
-        });
-      }).catchError((e) {
+          if(sonuc){
+            Navigator.pop(context);
+          }
+        }
+      }on PlatformException catch (e) {
         PlatformDuyarliAlertDialog(
-          baslik: "Şifreniz Güncellenemedi :(",
-          icerik: "Şifreniz Güncellenirken Bir Sorun Oluştu\n" + e.toString(),
-          anaButonYazisi: "Tamam",
+          baslik: "Şifre Güncelleme HATA",
+          icerik: Exceptions.goster(e.code),
+          anaButonYazisi: 'Tamam',
         ).goster(context);
-        setState(() {
-          result = "Kullanıcı getirilirken hata oluştu\n";
-          result += "Yeni şifreniz alanı boş geçilemez";
-        });
-      });
+      }
     } else {
       setState(() {
         otomatikKontrol = true;

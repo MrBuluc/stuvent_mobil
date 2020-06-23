@@ -91,7 +91,6 @@ class FirebaseAuthService implements AuthBase {
   Future<bool> sifreGuncelle(String password) async {
     try {
       await _firebaseAuth.currentUser().then((user) async {
-        print("user:" + user.displayName);
         await user.updatePassword(password).then((a) {
           return true;
         }).catchError((e) {

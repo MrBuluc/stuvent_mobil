@@ -103,6 +103,10 @@ class UserRepository implements AuthBase {
     return await _firestoreDBService.yoklamaAl(userID, eventName);
   }
 
+  Future<bool> updatePassword(String password) async {
+    return await _firebaseAuthService.sifreGuncelle(password);
+  }
+
   /*Future<String> uploadFile(
       String userID, String fileType, File profilFoto) async {
     if (appMode == AppMode.DEBUG) {
