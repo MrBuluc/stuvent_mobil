@@ -57,9 +57,12 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   children: <Widget>[
                     Row(
                       children: <Widget>[
-                        Text(
-                          "Dosyalar:",
-                          style: TextStyle(color: Colors.red, fontSize: 20),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "Dosyalar:",
+                            style: TextStyle(color: Colors.red, fontSize: 20),
+                          ),
                         ),
                       ],
                     ),
@@ -89,7 +92,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
             ),
             Row(children: <Widget>[
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
                 child: RaisedButton(
                     color: Color(0xFFFF4700),
                     textColor: Colors.white,
@@ -104,7 +107,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
               ),
               if (superU)
                 Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   child: RaisedButton(
                       color: Color(0xFFFF4700),
                       textColor: Colors.white,
@@ -119,23 +122,23 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                       },
                       child: const Text('QR oluştur')),
                 ),
-              if (superU)
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-                  child: RaisedButton(
-                      color: Colors.red,
-                      textColor: Colors.white,
-                      splashColor: Colors.black,
-                      onPressed: () {
-                        _silmekIcinOnayIste(
-                            context, _userModel, widget.event.title);
-                      },
-                      child: const Text('Etkinliği Kaldır')),
-                ),
             ]),
             if (superU)
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                child: RaisedButton(
+                    color: Colors.red,
+                    textColor: Colors.white,
+                    splashColor: Colors.black,
+                    onPressed: () {
+                      _silmekIcinOnayIste(
+                          context, _userModel, widget.event.title);
+                    },
+                    child: const Text('Etkinliği Kaldır')),
+              ),
+            if (superU)
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 child: RaisedButton(
                   color: _pickFileInProgress ? Colors.grey : Colors.green,
                   textColor: Colors.white,
