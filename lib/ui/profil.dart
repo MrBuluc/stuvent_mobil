@@ -1,14 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:stuventmobil/app/exceptions.dart';
 import 'package:stuventmobil/common_widget/platform_duyarli_alert_dialog.dart';
 import 'package:stuventmobil/model/user.dart';
 import 'package:stuventmobil/ui/Generate_Event/GeneratEvent.dart';
 import 'package:stuventmobil/viewmodel/user_model.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class Profil extends StatefulWidget {
   @override
@@ -16,7 +14,6 @@ class Profil extends StatefulWidget {
 }
 
 class _ProfilState extends State<Profil> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   final formKey = GlobalKey<FormState>();
 
@@ -136,7 +133,7 @@ class _ProfilState extends State<Profil> {
                         color: Colors.black, fontWeight: FontWeight.w800),
                   ),
                   onPressed: () {
-                    _cikisIcinOnayIste(context);
+                    _cikisIcinOnayIste(context, _userModel);
                   },
                   color: Colors.red,
                 ),
@@ -221,12 +218,10 @@ class _ProfilState extends State<Profil> {
     }
   }
 
-  Future<void> _cikisyap(BuildContext context) async {
+  Future<void> _cikisyap(BuildContext context, UserModel userModel) async {
     try {
-      final _googleSignIn = GoogleSignIn();
-      await _googleSignIn.signOut();
+      await userModel.signOut();
 
-      await _auth.signOut();
       final sonuc = await PlatformDuyarliAlertDialog(
         baslik: "Oturumunuz Kapatıldı :(",
         icerik: "Oturumunuz başarıyla kapatıldı\n" + "Yine Bekleriz...",
@@ -240,7 +235,7 @@ class _ProfilState extends State<Profil> {
     }
   }
 
-  Future<void> _cikisIcinOnayIste(BuildContext context) async {
+  Future<void> _cikisIcinOnayIste(BuildContext context, UserModel userModel) async {
     final sonuc = await PlatformDuyarliAlertDialog(
       baslik: "Emin Misiniz?",
       icerik: "Oturumu kapatmak istediğinizden emin misiniz?",
@@ -249,7 +244,7 @@ class _ProfilState extends State<Profil> {
     ).goster(context);
 
     if (sonuc) {
-      _cikisyap(context);
+      _cikisyap(context, userModel);
     }
   }
 }
