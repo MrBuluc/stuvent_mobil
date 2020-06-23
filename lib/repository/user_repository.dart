@@ -95,6 +95,10 @@ class UserRepository implements AuthBase {
     return await _firestoreDBService.getEtkinlikler();
   }
 
+  Future<bool> sendPasswordResetEmail(String mail) async {
+    return await _firebaseAuthService.sendPasswordResetEmail(mail);
+  }
+
   /*Future<String> uploadFile(
       String userID, String fileType, File profilFoto) async {
     if (appMode == AppMode.DEBUG) {

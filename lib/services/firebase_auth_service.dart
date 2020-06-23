@@ -22,7 +22,11 @@ class FirebaseAuthService implements AuthBase {
     if (user == null) {
       return null;
     } else {
-      return User(userID: user.uid, email: user.email, userName: user.displayName, superUser: false);
+      return User(
+          userID: user.uid,
+          email: user.email,
+          userName: user.displayName,
+          superUser: false);
     }
   }
 
@@ -88,7 +92,7 @@ class FirebaseAuthService implements AuthBase {
     try {
       await _firebaseAuth.currentUser().then((user) async {
         print("user:" + user.displayName);
-        await user.updatePassword(password).then((a){
+        await user.updatePassword(password).then((a) {
           return true;
         }).catchError((e) {
           print("Şifre güncellenirken hata oluştu $e");
@@ -98,11 +102,24 @@ class FirebaseAuthService implements AuthBase {
       }).catchError((e) {
         print("Kullanıcı getirilirken hata oluştu\n");
         print("Yeni şifreniz alanı boş geçilemez\n");
-        print("Hata: "+ e.toString());
+        print("Hata: " + e.toString());
         return false;
       });
     } catch (e) {
       print("Şifre Güncelleme hata: " + e.toString());
+      return false;
+    }
+  }
+
+  Future<bool> sendPasswordResetEmail(String mail) async {
+    try{
+      await _firebaseAuth
+          .sendPasswordResetEmail(email: mail)
+          .then((value) => true)
+          .catchError((onError) => false);
+    }
+    catch (e) {
+      print("sendPasswordResetEmail hata: " + e.toString());
       return false;
     }
   }

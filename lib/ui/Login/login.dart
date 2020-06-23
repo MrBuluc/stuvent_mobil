@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:stuventmobil/app/exceptions.dart';
@@ -13,7 +12,6 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   final formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -24,6 +22,7 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
+    UserModel _userModel = Provider.of<UserModel>(context);
     return Theme(
         data: Theme.of(context).copyWith(
             accentColor: Colors.green,
@@ -92,7 +91,7 @@ class _LoginState extends State<Login> {
                   ),
                   color: Colors.purple,
                   onPressed: () {
-                    _sifremiUnuttum();
+                    _sifremiUnuttum(_userModel);
                   },
                 ),
                 SizedBox(
@@ -134,17 +133,39 @@ class _LoginState extends State<Login> {
         ));
   }
 
-  Future<void> _sifremiUnuttum() async {
+  Future<void> _sifremiUnuttum(UserModel userModel) async {
     formKey.currentState.save();
-    _auth.sendPasswordResetEmail(email: mail).then((v) {
+    if(mail == ""){
       setState(() {
-        result = "Şifre sıfırlama E-mail ı gönderildi";
+        result = "E-posta alanını boş bırakamazsınız";
       });
-    }).catchError((e) {
-      setState(() {
-        result = "Şifremi unuttum mailinde hata";
-      });
-    });
+    }
+    else{
+      try {
+        bool sonuc = await userModel.sendPasswordResetEmail(mail);
+        if (sonuc== true || sonuc == null) {
+          PlatformDuyarliAlertDialog(
+            baslik: "Şifre Sıfırlama Mailı Gönderildi",
+            icerik:
+            "Şifre sıfırlama mailı başarılı bir şekilde $mail adresine gönderildi",
+            anaButonYazisi: "Tamam",
+          ).goster(context);
+        } else {
+          PlatformDuyarliAlertDialog(
+            baslik: "Şifre Sıfırlama Mailı Gönderilemedi :(",
+            icerik: "Şifre sıfırlama mailı gönderilirken bir sorun oluştu.\n" +
+                "İnternet bağlantınızı kontrol edin.",
+            anaButonYazisi: "Tamam",
+          ).goster(context);
+        }
+      } on PlatformException catch (e) {
+        PlatformDuyarliAlertDialog(
+          baslik: "Şifre Sıfırlama Mailı HATA",
+          icerik: Exceptions.goster(e.code),
+          anaButonYazisi: "Tamam",
+        ).goster(context);
+      }
+    }
   }
 
   String _emailKontrol(String value) {

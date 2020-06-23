@@ -203,4 +203,14 @@ class UserModel with ChangeNotifier implements AuthBase {
       print("user_model hata: " + e.toString());
     }
   }
+
+  Future<bool> sendPasswordResetEmail(String mail) async {
+    try{
+      bool sonuc = await _userRepository.sendPasswordResetEmail(mail);
+      return sonuc;
+    }
+    catch (e) {
+      print("user_model hata: " + e.toString());
+    }
+  }
 }
