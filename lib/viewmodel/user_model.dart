@@ -148,11 +148,11 @@ class UserModel with ChangeNotifier implements AuthBase {
   }
 
   Future<String> uploadFile(
-      String anaKlasor, File file, String title, String fileName) async {
+      String anaKlasor, File file, String etkinlikAdi, String fileName) async {
     try {
       state = ViewState.Busy;
       String url =
-          await _userRepository.uploadFile(anaKlasor, file, title, fileName);
+          await _userRepository.uploadFile(anaKlasor, file, etkinlikAdi, fileName);
       return url;
     } catch (e) {
       print("user_model hata: " + e.toString());

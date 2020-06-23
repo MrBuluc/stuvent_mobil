@@ -60,10 +60,9 @@ class _GeneratEventState extends State<GeneratEvent> {
                       border: OutlineInputBorder(),
                     ),
                     validator: (String value) {
-                      if(etkinlikler.contains(value)){
+                      if (etkinlikler.contains(value)) {
                         return "Bu etkinlik bulunmaktadır";
-                      }
-                      else
+                      } else
                         return null;
                     },
                     onSaved: (String value) => event_name = value,
@@ -200,13 +199,11 @@ class _GeneratEventState extends State<GeneratEvent> {
       setState(() {
         result = "Etkinlik oluşturuluyor...";
       });
-      if(formKey.currentState.validate()){
+      if (formKey.currentState.validate()) {
         formKey.currentState.save();
-        StorageReference _storageReference = FirebaseStorage.instance
-            .ref()
-            .child("Etkinlikler/$event_name/event_photo.png");
-        StorageUploadTask uploadTask = _storageReference.putFile(_secilenResim);
-        var url = await (await uploadTask.onComplete).ref.getDownloadURL();
+
+        String url = await userModel.uploadFile(
+            "Etkinlikler", _secilenResim, event_name, "event_photo.png");
 
         List katilimcilar = [];
 
@@ -232,7 +229,7 @@ class _GeneratEventState extends State<GeneratEvent> {
             icerik: "Etkinlik Başarıyla Oluşturuldu",
             anaButonYazisi: "Tamam",
           ).goster(context);
-          if(sonuc1){
+          if (sonuc1) {
             Navigator.pop(context);
           }
         } else {
@@ -243,7 +240,6 @@ class _GeneratEventState extends State<GeneratEvent> {
           ).goster(context);
         }
       }
-
     }
   }
 
