@@ -222,7 +222,7 @@ class _GeneratEventState extends State<GeneratEvent> {
 
         bool sonuc = await userModel.setData("Etkinlikler", event_name, data);
 
-        if (sonuc) {
+        if (sonuc == true || sonuc == null) {
           final sonuc1 = await PlatformDuyarliAlertDialog(
             baslik: "Etkinlik Oluşturuldu",
             icerik: "Etkinlik Başarıyla Oluşturuldu",

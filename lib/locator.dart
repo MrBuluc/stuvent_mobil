@@ -1,4 +1,5 @@
 import 'package:stuventmobil/repository/user_repository.dart';
+import 'package:stuventmobil/services/bildirim_gonderme_servis.dart';
 import 'package:stuventmobil/services/firebase_auth_service.dart';
 import 'package:stuventmobil/services/firebase_storage_service.dart';
 import 'package:stuventmobil/services/firestore_db_service.dart';
@@ -11,4 +12,5 @@ void setupLocator() {
   locator.registerLazySingleton(() => FirestoreDBService());
   locator.registerLazySingleton(() => FirebaseStorageService());
   locator.registerLazySingleton(() => UserRepository());
+  locator.registerLazySingleton(() => BildirimGondermeServis());
 }

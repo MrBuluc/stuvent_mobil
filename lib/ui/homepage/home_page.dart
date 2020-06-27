@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +11,7 @@ import 'package:stuventmobil/ui/homepage/home_page_background.dart';
 import 'package:stuventmobil/app_state.dart';
 import 'package:stuventmobil/ui/profil.dart';
 import 'category_widget.dart';
+import 'package:stuventmobil/notification_handler.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -17,11 +19,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     events.clear();
+    NotificationHandler().initializeFCMNotification(context);
+
   }
 
   @override

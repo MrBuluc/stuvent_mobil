@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:stuventmobil/locator.dart';
+import 'package:stuventmobil/model/event.dart';
 import 'package:stuventmobil/model/user.dart';
 import 'package:stuventmobil/services/auth_base.dart';
+import 'package:stuventmobil/services/bildirim_gonderme_servis.dart';
 import 'package:stuventmobil/services/firebase_auth_service.dart';
 import 'package:stuventmobil/services/firestore_db_service.dart';
 import "package:stuventmobil/services/firebase_storage_service.dart";
@@ -12,6 +14,8 @@ class UserRepository implements AuthBase {
   FirestoreDBService _firestoreDBService = locator<FirestoreDBService>();
   FirebaseStorageService _firebaseStorageService =
       locator<FirebaseStorageService>();
+  BildirimGondermeServis _bildirimGondermeServis =
+      locator<BildirimGondermeServis>();
 
   @override
   Future<User> currentUser() async {
@@ -47,7 +51,6 @@ class UserRepository implements AuthBase {
   @override
   Future<User> createUserWithEmailandPassword(String name, String lastname,
       String mail, String password, bool superUser) async {
-
     User _user = await _firebaseAuthService.createUserWithEmailandPassword(
         name, lastname, mail, password, superUser);
     Map<String, dynamic> data = _user.toMap();
@@ -79,12 +82,17 @@ class UserRepository implements AuthBase {
         anaKLasor, file, etkinlikAdi, fileName);
   }
 
-  Future<bool> update(String collection, String documentName, String alan, dynamic map) async {
-    return await _firestoreDBService.update(collection, documentName, alan, map);
+  Future<bool> update(
+      String collection, String documentName, String alan, dynamic map) async {
+    return await _firestoreDBService.update(
+        collection, documentName, alan, map);
   }
 
   setData(String s, String event_name, Map<String, dynamic> data) async {
-    return await _firestoreDBService.setData(s, event_name, data);
+    var dbYazmaIslemi = await _firestoreDBService.setData(s, event_name, data);
+    if (dbYazmaIslemi) {
+      await _bildirimGondermeServis.bildirimGonder(data);
+    }
   }
 
   Future<bool> eventDel(String document) async {
