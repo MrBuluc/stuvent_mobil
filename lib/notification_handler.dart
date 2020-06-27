@@ -56,23 +56,36 @@ class NotificationHandler {
   }
 
   static void showNotification(Map<String, dynamic> message) async {
+    var bigTextStyleInformation;
+    var bigPictureStyleInformation;
 
-    var bigPicturePath =
-        await _downloadAndSaveFile(message["data"]["image-url"], 'bigPicture');
+    if(message["data"].containsKey("bigText")){
+      bigTextStyleInformation = BigTextStyleInformation(
+          message["data"]["bigText"],
+          htmlFormatBigText: true,
+          contentTitle: message["data"]["title"],
+          htmlFormatContentTitle: true,
+          summaryText: message["data"]["message"],
+          htmlFormatSummaryText: true);
+    }
+    else{
+      var bigPicturePath =
+      await _downloadAndSaveFile(message["data"]["image-url"], 'bigPicture');
 
-    var bigPictureStyleInformation = BigPictureStyleInformation(
-        FilePathAndroidBitmap(bigPicturePath),
-        contentTitle: message["data"]["title"],
-        htmlFormatContentTitle: true,
-        summaryText: message["data"]["message"],
-        htmlFormatSummaryText: true);
+      bigPictureStyleInformation = BigPictureStyleInformation(
+          FilePathAndroidBitmap(bigPicturePath),
+          contentTitle: message["data"]["title"],
+          htmlFormatContentTitle: true,
+          summaryText: message["data"]["message"],
+          htmlFormatSummaryText: true);
+    }
 
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
         '1234', 'Yeni Mesaj', 'your channel description',
         importance: Importance.Max,
         priority: Priority.High,
         ticker: 'ticker',
-        styleInformation: bigPictureStyleInformation);
+        styleInformation: message["data"].containsKey("bigText") ? bigTextStyleInformation : bigPictureStyleInformation);
 
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
