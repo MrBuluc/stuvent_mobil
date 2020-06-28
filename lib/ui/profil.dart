@@ -6,6 +6,7 @@ import 'package:stuventmobil/app/exceptions.dart';
 import 'package:stuventmobil/common_widget/platform_duyarli_alert_dialog.dart';
 import 'package:stuventmobil/model/user.dart';
 import 'package:stuventmobil/ui/Generate_Event/GeneratEvent.dart';
+import 'package:stuventmobil/ui/Generate_Notification/GenerateNotification.dart';
 import 'package:stuventmobil/viewmodel/user_model.dart';
 
 class Profil extends StatefulWidget {
@@ -121,6 +122,23 @@ class _ProfilState extends State<Profil> {
                       );
                     },
                     color: Colors.green,
+                  ),
+                SizedBox(
+                  height: 10,
+                ),
+                if (superU)
+                  RaisedButton(
+                    child: Text(
+                      "Yeni Duyuru Bildirimi Oluştur",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => GenerateNotification()),
+                      );
+                    },
+                    color: Colors.blue,
                   ),
                 if (superU)
                   SizedBox(

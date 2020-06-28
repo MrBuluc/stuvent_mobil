@@ -210,4 +210,14 @@ class UserModel with ChangeNotifier implements AuthBase {
       print("user_model hata: " + e.toString());
     }
   }
+
+  Future<bool> generateNotification(String title, String message, String bigText) async {
+    try{
+      bool sonuc = await _userRepository.generateNotification(title, message, bigText);
+      return sonuc;
+    }
+    catch (e) {
+      print("user_model hata: " + e.toString());
+    }
+  }
 }

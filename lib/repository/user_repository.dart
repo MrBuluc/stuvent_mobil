@@ -88,11 +88,10 @@ class UserRepository implements AuthBase {
         collection, documentName, alan, map);
   }
 
-  setData(String s, String event_name, Map<String, dynamic> data) async {
-    var dbYazmaIslemi = true;
-    //await _firestoreDBService.setData(s, event_name, data);
+  Future<bool> setData(String s, String event_name, Map<String, dynamic> data) async {
+    var dbYazmaIslemi = await _firestoreDBService.setData(s, event_name, data);
     if (dbYazmaIslemi) {
-      await _bildirimGondermeServis.bildirimGonder(data);
+      return await _bildirimGondermeServis.eventBildirimGonder(data);
     }
   }
 
@@ -114,6 +113,10 @@ class UserRepository implements AuthBase {
 
   Future<bool> updatePassword(String password) async {
     return await _firebaseAuthService.sifreGuncelle(password);
+  }
+
+  Future<bool> generateNotification(String title, String message, String bigText) async {
+    return await _bildirimGondermeServis.bigTextBildirimGonder(title, message, bigText);
   }
 
   /*Future<String> uploadFile(
