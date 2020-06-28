@@ -20,7 +20,7 @@ class _MyAppState extends State<MyApp> {
     return ChangeNotifierProvider(
       create: (context) => UserModel(),
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Stuvent Etkinlik Habercisi',
         debugShowCheckedModeBanner: true,
         home: LandingPage(),
         theme: ThemeData(
