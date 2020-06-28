@@ -1,0 +1,10 @@
+{
+    "to": "/topics/all",
+    "data": {
+        "title": "Arduino",
+        "message": "ALM",
+        "image-url": "https://firebasestorage.googleapis.com/v0/b/stuvent-mobil.appspot.com/o/Etkinlikler%2FArdiuno%2Fevent_photo.png?alt=media&token=f7e81434-ef2c-43e4-b7a9-3115bbe39a53",
+        "category": "[0,4]",
+        "Dosyalar": "{}"
+    }
+}

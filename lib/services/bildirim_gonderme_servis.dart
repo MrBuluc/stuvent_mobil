@@ -15,8 +15,11 @@ class BildirimGondermeServis {
     String location = eventMap["Etkinlik Konumu"];
     String title = eventMap["Etkinlik Adı"];
     String image_url = eventMap["Etkinlik Photo Url"];
+    List<dynamic> categoryList = eventMap["category"];
+    Map<String, dynamic> docMap = eventMap["Dosyalar"];
 
-    String json = '{"to": "/topics/all", "data": {"title": "$title", "message": "$location", "image-url": "$image_url",}}';
+    String json =
+        '{"to": "/topics/all", "data": {"title": "$title", "message": "$location", "image-url": "$image_url", "category": "$categoryList", "Dosyalar": "$docMap"}}';
 
     http.Response response =
         await http.post(endUrl, headers: headers, body: json);

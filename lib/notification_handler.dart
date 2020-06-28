@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
@@ -5,15 +6,34 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
+import 'package:stuventmobil/ui/event_details/event_details_page.dart';
+import 'model/event.dart';
+import 'package:rxdart/subjects.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
+final BehaviorSubject<ReceivedNotification> didReceiveLocalNotificationSubject =
+    BehaviorSubject<ReceivedNotification>();
 
-Future<void> myBackgroundMessageHandler(Map<String, dynamic> message) {
+class ReceivedNotification {
+  final int id;
+  final String title;
+  final String body;
+  final String payload;
+
+  ReceivedNotification({
+    @required this.id,
+    @required this.title,
+    @required this.body,
+    @required this.payload,
+  });
+}
+
+Future<void> myBackgroundMessageHandler(Map<String, dynamic> message) async {
   if (message.containsKey('data')) {
     // Handle data message
     final dynamic data = message['data'];
-    print("Arka planda gelen data:" + message["data"].toString());
+    print("Arka planda gelen data:" + data.toString());
     NotificationHandler.showNotification(message);
   }
 
@@ -28,12 +48,21 @@ class NotificationHandler {
     return _singLeton;
   }
   NotificationHandler._internal();
+  BuildContext myContext;
 
   initializeFCMNotification(BuildContext context) async {
+    myContext = context;
     var initializationSettingsAndroid =
         AndroidInitializationSettings("app_icon");
     var initializationSettingsIOS = IOSInitializationSettings(
-        onDidReceiveLocalNotification: onDidReceiveLocalNotification);
+        requestAlertPermission: false,
+        requestBadgePermission: false,
+        requestSoundPermission: false,
+        onDidReceiveLocalNotification:
+            (int id, String title, String body, String payload) async {
+          didReceiveLocalNotificationSubject.add(ReceivedNotification(
+              id: id, title: title, body: body, payload: payload));
+        });
     var initializationSettings = InitializationSettings(
         initializationSettingsAndroid, initializationSettingsIOS);
     flutterLocalNotificationsPlugin.initialize(initializationSettings,
@@ -43,7 +72,7 @@ class NotificationHandler {
     _fcm.configure(
       onMessage: (Map<String, dynamic> message) async {
         print("onMessage: $message");
-        showNotification(message);
+        await showNotification(message);
       },
       onBackgroundMessage: myBackgroundMessageHandler,
       onLaunch: (Map<String, dynamic> message) async {
@@ -55,11 +84,11 @@ class NotificationHandler {
     );
   }
 
-  static void showNotification(Map<String, dynamic> message) async {
+  static Future<void> showNotification(Map<String, dynamic> message) async {
     var bigTextStyleInformation;
     var bigPictureStyleInformation;
 
-    if(message["data"].containsKey("bigText")){
+    if (message["data"].containsKey("bigText")) {
       bigTextStyleInformation = BigTextStyleInformation(
           message["data"]["bigText"],
           htmlFormatBigText: true,
@@ -67,10 +96,9 @@ class NotificationHandler {
           htmlFormatContentTitle: true,
           summaryText: message["data"]["message"],
           htmlFormatSummaryText: true);
-    }
-    else{
-      var bigPicturePath =
-      await _downloadAndSaveFile(message["data"]["image-url"], 'bigPicture');
+    } else {
+      var bigPicturePath = await _downloadAndSaveFile(
+          message["data"]["image-url"], 'bigPicture');
 
       bigPictureStyleInformation = BigPictureStyleInformation(
           FilePathAndroidBitmap(bigPicturePath),
@@ -85,32 +113,60 @@ class NotificationHandler {
         importance: Importance.Max,
         priority: Priority.High,
         ticker: 'ticker',
-        styleInformation: message["data"].containsKey("bigText") ? bigTextStyleInformation : bigPictureStyleInformation);
+        styleInformation: message["data"].containsKey("bigText")
+            ? bigTextStyleInformation
+            : bigPictureStyleInformation);
 
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.show(0, message["data"]["title"],
         message["data"]["message"], platformChannelSpecifics,
-        payload: 'Bildirim tıklanınca aktarılan değer');
+        payload: jsonEncode(message));
   }
 
-  Future onSelectNotification(String payload) {
+  Future onSelectNotification(String payload) async {
     if (payload != null) {
       debugPrint("notification payload: " + payload);
+      Map<String, dynamic> gelenBildirim = await jsonDecode(payload);
+      Map<String, dynamic> data = gelenBildirim["data"];
+      List<dynamic> categoryIds = [0];
+      Map<String, dynamic> documentsMap = {};
+
+      try {
+        Event event = Event(
+            title: data["title"],
+            location: data["message"],
+            categoryIds: categoryIds,
+            imageURL: data["image-url"],
+            documentsMap: documentsMap);
+        print("Event: $event");
+
+        Navigator.push(
+            myContext,
+            MaterialPageRoute(
+              builder: (context) => EventDetailsPage(
+                event: event,
+              ),
+            ));
+      } catch (e) {
+        print("Hata: $e");
+      }
     }
   }
 
-  Future onDidReceiveLocalNotification(
-      int id, String title, String body, String payload) {}
-
   static Future<String> _downloadAndSaveFile(
       String url, String fileName) async {
-    var directory = await getApplicationDocumentsDirectory();
-    var filePath = '${directory.path}/$fileName';
-    var response = await http.get(url);
-    var file = File(filePath);
-    await file.writeAsBytes(response.bodyBytes);
-    return filePath;
+    try{
+      var directory = await getApplicationDocumentsDirectory();
+      var filePath = '${directory.path}/$fileName';
+      var response = await http.get(url);
+      var file = File(filePath);
+      await file.writeAsBytes(response.bodyBytes);
+      return filePath;
+    }catch (e) {
+      print(" _downloadAndSaveFile Hata: $e");
+    }
+
   }
 }

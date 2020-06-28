@@ -31,7 +31,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   @override
   Widget build(BuildContext context) {
     UserModel _userModel = Provider.of<UserModel>(context);
-    superUser(_userModel);
+    superUser(_userModel, context);
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -159,7 +159,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     );
   }
 
-  Future<void> superUser(UserModel userModel) async {
+  Future<void> superUser(UserModel userModel, BuildContext context) async {
     User user = await userModel.currentUser();
     docMap = widget.event.documentsMap;
     if (docMap.isNotEmpty) {

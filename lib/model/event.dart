@@ -11,7 +11,8 @@ class Event {
     return "title: $title \n"+
             "location: $location \n"+
             "categoryIds: $categoryIds \n"+
-            "documentsList: $documentsMap \n";
+            "documentsList: $documentsMap \n"+
+            "imageURL: $imageURL \n";
   }
 
   Event(
