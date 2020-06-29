@@ -1,4 +1,3 @@
-import 'package:stuventmobil/model/event.dart';
 import 'package:http/http.dart' as http;
 
 class BildirimGondermeServis {
