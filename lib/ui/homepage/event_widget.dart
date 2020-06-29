@@ -55,7 +55,7 @@ class _EventWidgetState extends State<EventWidget> {
                         SizedBox(
                           height: 10.0,
                         ),
-                        FittedBox(
+                        /*FittedBox(
                           child: Row(
                             children: <Widget>[
                               Icon(Icons.location_on),
@@ -68,7 +68,7 @@ class _EventWidgetState extends State<EventWidget> {
                               ),
                             ],
                           ),
-                        ),
+                        ),*/
                       ],
                     ),
                   ),

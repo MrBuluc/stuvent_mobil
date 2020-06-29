@@ -6,6 +6,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
+import 'package:stuventmobil/common_widget/platform_duyarli_alert_dialog.dart';
 import 'package:stuventmobil/ui/event_details/event_details_page.dart';
 import 'model/event.dart';
 import 'package:rxdart/subjects.dart';
@@ -130,43 +131,50 @@ class NotificationHandler {
       debugPrint("notification payload: " + payload);
       Map<String, dynamic> gelenBildirim = await jsonDecode(payload);
       Map<String, dynamic> data = gelenBildirim["data"];
-      List<dynamic> categoryIds = [0];
-      Map<String, dynamic> documentsMap = {};
+      if (data.containsKey("image-url")) {
+        List<dynamic> categoryIds = [0];
+        Map<String, dynamic> documentsMap = {};
 
-      try {
-        Event event = Event(
-            title: data["title"],
-            location: data["message"],
-            categoryIds: categoryIds,
-            imageURL: data["image-url"],
-            documentsMap: documentsMap);
-        print("Event: $event");
+        try {
+          Event event = Event(
+              title: data["title"],
+              location: data["message"],
+              categoryIds: categoryIds,
+              imageURL: data["image-url"],
+              documentsMap: documentsMap);
+          print("Event: $event");
 
-        Navigator.push(
-            myContext,
-            MaterialPageRoute(
-              builder: (context) => EventDetailsPage(
-                event: event,
-              ),
-            ));
-      } catch (e) {
-        print("Hata: $e");
+          Navigator.push(
+              myContext,
+              MaterialPageRoute(
+                builder: (context) => EventDetailsPage(
+                  event: event,
+                ),
+              ));
+        } catch (e) {
+          print("Hata: $e");
+        }
+      } else {
+        await PlatformDuyarliAlertDialog(
+          baslik: data["title"],
+          icerik: data["bigText"],
+          anaButonYazisi: "Tamam",
+        ).goster(myContext);
       }
     }
   }
 
   static Future<String> _downloadAndSaveFile(
       String url, String fileName) async {
-    try{
+    try {
       var directory = await getApplicationDocumentsDirectory();
       var filePath = '${directory.path}/$fileName';
       var response = await http.get(url);
       var file = File(filePath);
       await file.writeAsBytes(response.bodyBytes);
       return filePath;
-    }catch (e) {
+    } catch (e) {
       print(" _downloadAndSaveFile Hata: $e");
     }
-
   }
 }
