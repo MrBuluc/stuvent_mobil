@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:stuventmobil/locator.dart';
-import 'package:stuventmobil/model/event.dart';
 import 'package:stuventmobil/model/user.dart';
 import 'package:stuventmobil/services/auth_base.dart';
 import 'package:stuventmobil/services/bildirim_gonderme_servis.dart';
@@ -88,11 +87,12 @@ class UserRepository implements AuthBase {
         collection, documentName, alan, map);
   }
 
-  Future<bool> setData(String s, String event_name, Map<String, dynamic> data) async {
-    var dbYazmaIslemi = await _firestoreDBService.setData(s, event_name, data);
+  Future<bool> setData(String s, String eventName, Map<String, dynamic> data) async {
+    var dbYazmaIslemi = await _firestoreDBService.setData(s, eventName, data);
     if (dbYazmaIslemi) {
       return await _bildirimGondermeServis.eventBildirimGonder(data);
     }
+    return false;
   }
 
   Future<bool> eventDel(String document) async {
