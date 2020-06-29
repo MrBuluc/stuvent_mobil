@@ -89,8 +89,7 @@ class UserRepository implements AuthBase {
   }
 
   Future<bool> setData(String s, String event_name, Map<String, dynamic> data) async {
-    var dbYazmaIslemi = true;
-    //await _firestoreDBService.setData(s, event_name, data);
+    var dbYazmaIslemi = await _firestoreDBService.setData(s, event_name, data);
     if (dbYazmaIslemi) {
       return await _bildirimGondermeServis.eventBildirimGonder(data);
     }
