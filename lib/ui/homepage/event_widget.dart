@@ -43,7 +43,7 @@ class _EventWidgetState extends State<EventWidget> {
               padding: const EdgeInsets.only(top: 8.0, left: 8.0),
               child: Row(
                 children: <Widget>[
-                  Expanded(
+                  /*Expanded(
                     flex: 3,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,7 +55,7 @@ class _EventWidgetState extends State<EventWidget> {
                         SizedBox(
                           height: 10.0,
                         ),
-                        /*FittedBox(
+                        *//*FittedBox(
                           child: Row(
                             children: <Widget>[
                               Icon(Icons.location_on),
@@ -68,10 +68,10 @@ class _EventWidgetState extends State<EventWidget> {
                               ),
                             ],
                           ),
-                        ),*/
+                        ),*//*
                       ],
                     ),
-                  ),
+                  ),*/
                   Expanded(
                     flex: 1,
                     child: Text(
