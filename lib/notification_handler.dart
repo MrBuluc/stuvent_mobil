@@ -99,7 +99,7 @@ class NotificationHandler {
           htmlFormatSummaryText: true);
     } else {
       var bigPicturePath = await _downloadAndSaveFile(
-          message["data"]["image-url"], 'bigPicture');
+          message["data"]["image-url"], 'bigPicture.jpg');
 
       bigPictureStyleInformation = BigPictureStyleInformation(
           FilePathAndroidBitmap(bigPicturePath),
@@ -167,8 +167,9 @@ class NotificationHandler {
   static Future<String> _downloadAndSaveFile(
       String url, String fileName) async {
     try {
-      var directory = await getApplicationDocumentsDirectory();
-      var filePath = '${directory.path}/$fileName';
+      /*var directory = await getApplicationDocumentsDirectory();
+      var filePath = '${directory.path}/$fileName';*/
+      String filePath = '/data/user/0/github.io.emirxmertoglu.stuventmobil/app_flutter/$fileName';
       var response = await http.get(url);
       var file = File(filePath);
       await file.writeAsBytes(response.bodyBytes);

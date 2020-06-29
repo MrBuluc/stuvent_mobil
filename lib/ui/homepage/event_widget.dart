@@ -18,10 +18,10 @@ class _EventWidgetState extends State<EventWidget> {
       elevation: 4.0,
       color: Colors.white,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(24.0)),
+        borderRadius: BorderRadius.all(Radius.circular(31.0)),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(1.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
@@ -39,11 +39,11 @@ class _EventWidgetState extends State<EventWidget> {
                 ),
               ),
             ),
-            Padding(
+            /*Padding(
               padding: const EdgeInsets.only(top: 8.0, left: 8.0),
               child: Row(
                 children: <Widget>[
-                  /*Expanded(
+                  *//*Expanded(
                     flex: 3,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,7 +55,7 @@ class _EventWidgetState extends State<EventWidget> {
                         SizedBox(
                           height: 10.0,
                         ),
-                        *//*FittedBox(
+                        *//**//*FittedBox(
                           child: Row(
                             children: <Widget>[
                               Icon(Icons.location_on),
@@ -68,10 +68,10 @@ class _EventWidgetState extends State<EventWidget> {
                               ),
                             ],
                           ),
-                        ),*//*
+                        ),*//**//*
                       ],
                     ),
-                  ),*/
+                  ),*//*
                   Expanded(
                     flex: 1,
                     child: Text(
@@ -83,7 +83,7 @@ class _EventWidgetState extends State<EventWidget> {
                   ),
                 ],
               ),
-            ),
+            ),*/
           ],
         ),
       ),

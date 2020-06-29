@@ -21,7 +21,7 @@ class _MyAppState extends State<MyApp> {
       create: (context) => UserModel(),
       child: MaterialApp(
         title: 'Stuvent Etkinlik Habercisi',
-        debugShowCheckedModeBanner: true,
+        debugShowCheckedModeBanner: false,
         home: LandingPage(),
         theme: ThemeData(
           scaffoldBackgroundColor: Color(0xFFFFFFFF),

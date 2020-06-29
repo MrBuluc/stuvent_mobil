@@ -4,11 +4,11 @@ class BildirimGondermeServis {
   Future<bool> eventBildirimGonder(Map<String, dynamic> eventMap) async {
     String endUrl = "https://fcm.googleapis.com/fcm/send";
 
-    String firebaseKey =
+    String stuventFirebaseKey =
         "AAAAzHFBr9k:APA91bHUcYB__s-PeOXLul36TJ6R2VDXTMjY9q0QOclc9TRkrRlO17peox1M25Ii0NW49FFVEiUq1zTd7wDcBr49fhweeUm3nbZVdkjtrmqbcbvb8UbZIq-Nz5d3jJLjfnEPwtX6LFcN";
     Map<String, String> headers = {
       "Content-Type": "application/json",
-      "Authorization": "key=$firebaseKey"
+      "Authorization": "key=$stuventFirebaseKey"
     };
 
     String location = eventMap["Etkinlik Konumu"];
@@ -36,11 +36,11 @@ class BildirimGondermeServis {
   Future<bool> bigTextBildirimGonder(String title, String message, String bigText) async {
     String endUrl = "https://fcm.googleapis.com/fcm/send";
 
-    String firebaseKey =
+    String stuventFirebaseKey =
         "AAAAzHFBr9k:APA91bHUcYB__s-PeOXLul36TJ6R2VDXTMjY9q0QOclc9TRkrRlO17peox1M25Ii0NW49FFVEiUq1zTd7wDcBr49fhweeUm3nbZVdkjtrmqbcbvb8UbZIq-Nz5d3jJLjfnEPwtX6LFcN";
     Map<String, String> headers = {
       "Content-Type": "application/json",
-      "Authorization": "key=$firebaseKey"
+      "Authorization": "key=$stuventFirebaseKey"
     };
 
     String json = '{"to": "/topics/all", "data": {"title": "$title", "message": "$message", "bigText": "$bigText"}}';
