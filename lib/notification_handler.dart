@@ -110,7 +110,9 @@ class NotificationHandler {
     }
 
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        '1234', 'Yeni Mesaj', 'your channel description',
+        '1234', 'Etkinlik ve Duyuru Bildirimleri',
+        'Bu kanaldan etkinlik ve duyuru bildirimlerini paylaşıyoruz.\n'+
+        "Etkinlik ve duyurulardan haberdar olmak için bu kanalı açık tutun.",
         importance: Importance.Max,
         priority: Priority.High,
         ticker: 'ticker',
