@@ -238,7 +238,12 @@ class _GeneratEventState extends State<GeneratEvent> {
             anaButonYazisi: "Tamam",
           ).goster(context);
         }
+      }else{
+        setState(() {
+          result = "Etkinlik adını doğru giriniz";
+        });
       }
+
     }
   }
 

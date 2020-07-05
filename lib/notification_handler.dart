@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -45,10 +46,13 @@ class NotificationHandler {
   FirebaseMessaging _fcm = FirebaseMessaging();
 
   static final NotificationHandler _singLeton = NotificationHandler._internal();
+
   factory NotificationHandler() {
     return _singLeton;
   }
+
   NotificationHandler._internal();
+
   BuildContext myContext;
 
   initializeFCMNotification(BuildContext context) async {
@@ -110,9 +114,10 @@ class NotificationHandler {
     }
 
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        '1234', 'Etkinlik ve Duyuru Bildirimleri',
-        'Bu kanaldan etkinlik ve duyuru bildirimlerini paylaşıyoruz.\n'+
-        "Etkinlik ve duyurulardan haberdar olmak için bu kanalı açık tutun.",
+        '1234',
+        'Etkinlik ve Duyuru Bildirimleri',
+        'Bu kanaldan etkinlik ve duyuru bildirimlerini paylaşıyoruz.\n' +
+            "Etkinlik ve duyurulardan haberdar olmak için bu kanalı açık tutun.",
         importance: Importance.Max,
         priority: Priority.High,
         ticker: 'ticker',
@@ -169,9 +174,17 @@ class NotificationHandler {
   static Future<String> _downloadAndSaveFile(
       String url, String fileName) async {
     try {
-      /*var directory = await getApplicationDocumentsDirectory();
-      var filePath = '${directory.path}/$fileName';*/
-      String filePath = '/data/user/0/github.io.emirxmertoglu.stuventmobil/app_flutter/$fileName';
+      var directory = await getApplicationDocumentsDirectory();
+      var filePath = '${directory.path}/$fileName';
+      print("filePath: $filePath");
+      //String filePath = '/data/user/0/github.io.emirxmertoglu.stuventmobil/app_flutter/$fileName';
+      var response = await http.get(url);
+      var file = File(filePath);
+      await file.writeAsBytes(response.bodyBytes);
+      return filePath;
+    } on MissingPluginException catch (e) {
+      String filePath =
+          '/data/user/0/github.io.emirxmertoglu.stuventmobil/app_flutter/$fileName';
       var response = await http.get(url);
       var file = File(filePath);
       await file.writeAsBytes(response.bodyBytes);
