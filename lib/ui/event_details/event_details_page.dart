@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stuventmobil/common_widget/platform_duyarli_alert_dialog.dart';
-import 'package:stuventmobil/model/user.dart';
+import 'package:stuventmobil/model/userC.dart';
 import 'package:stuventmobil/viewmodel/user_model.dart';
 import '../../model/event.dart';
 import 'package:stuventmobil/ui/QrCode/generate.dart';
@@ -78,6 +78,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                 debugPrint("Could not launch $docMap[keys]");
                               }
                             },
+                            //onLongPress: ,
                             child: Text(
                               keys,
                               style:
@@ -144,9 +145,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   textColor: Colors.white,
                   splashColor: Colors.blueGrey,
                   onPressed: () {
-                    _pickFileInProgress
-                        ? null
-                        : _pickDocument(context, _userModel);
+                    if(!_pickFileInProgress)
+                        _pickDocument(context, _userModel);
                   },
                   child: Text(
                     _pickFileInProgress ? "Dosya Yükleniyor" : "Dosya Paylaş",
@@ -160,7 +160,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
   }
 
   Future<void> superUser(UserModel userModel, BuildContext context) async {
-    User user = await userModel.currentUser();
+    UserC user = await userModel.currentUser();
     docMap = widget.event.documentsMap;
     if (docMap.isNotEmpty) {
       setState(() {

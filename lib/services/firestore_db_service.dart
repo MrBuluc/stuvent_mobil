@@ -1,18 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'package:stuventmobil/model/user.dart';
+import 'package:stuventmobil/model/userC.dart';
 import 'package:stuventmobil/services/database_base.dart';
 
 class FirestoreDBService implements DBBase {
-  final Firestore _firebaseDB = Firestore.instance;
+  final FirebaseFirestore _firebaseDB = FirebaseFirestore.instance;
 
   @override
-  Future<User> readUser(String userID) async {
+  Future<UserC> readUser(String userID) async {
     DocumentSnapshot _okunanUser =
-    await _firebaseDB.collection("Users").document(userID).get();
-    Map<String, dynamic> _okunanUserBilgileriMap = _okunanUser.data;
+        await _firebaseDB.collection("Users").doc(userID).get();
+    Map<String, dynamic> _okunanUserBilgileriMap = _okunanUser.data();
 
-    User _okunanUserNesnesi = User.userfromMap(_okunanUserBilgileriMap);
+    UserC _okunanUserNesnesi = UserC.userfromMap(_okunanUserBilgileriMap);
 
     return _okunanUserNesnesi;
   }
@@ -21,8 +20,8 @@ class FirestoreDBService implements DBBase {
       dynamic newData) async {
     await _firebaseDB
         .collection(collection)
-        .document(documentName)
-        .updateData({alan: newData}).then((value) {
+        .doc(documentName)
+        .update({alan: newData}).then((value) {
       return true;
     }).catchError((onError) {
       print("db_service update hata: " + onError.toString());
@@ -34,18 +33,18 @@ class FirestoreDBService implements DBBase {
   Future<bool> updateProfilFoto(String userID, String profilFotoURL) async {
     await _firebaseDB
         .collection("users")
-        .document(userID)
-        .updateData({'profilURL': profilFotoURL});
+        .doc(userID)
+        .update({'profilURL': profilFotoURL});
     return true;
   }
 
   @override
-  Future<bool> setData(String collection, String document,
-      Map<String, dynamic> map) async {
+  Future<bool> setData(
+      String collection, String document, Map<String, dynamic> map) async {
     await _firebaseDB
         .collection(collection)
-        .document(document)
-        .setData(map)
+        .doc(document)
+        .set(map)
         .catchError((onError) {
       print("db setData hata: " + onError.toString());
     });
@@ -56,7 +55,7 @@ class FirestoreDBService implements DBBase {
   Future<bool> eventDel(String document) async {
     await _firebaseDB
         .collection("Etkinlikler")
-        .document(document)
+        .doc(document)
         .delete()
         .catchError((onError) {
       print("db setData hata: " + onError.toString());
@@ -67,32 +66,35 @@ class FirestoreDBService implements DBBase {
 
   Future<List<String>> getEtkinlikler() async {
     QuerySnapshot querySnapshot =
-    await _firebaseDB.collection("Etkinlikler").getDocuments();
+        await _firebaseDB.collection("Etkinlikler").get();
 
-    List<DocumentSnapshot> documentSnapshotList = querySnapshot.documents;
+    List<DocumentSnapshot> documentSnapshotList = querySnapshot.docs;
 
     List<String> etkinlikler = [];
     documentSnapshotList.forEach((documentSnapshot) {
-      etkinlikler.add(documentSnapshot.data["Etkinlik Adı"]);
+      Map<String, dynamic> data = documentSnapshot.data();
+      etkinlikler.add(data["Etkinlik Adı"]);
     });
 
     return etkinlikler;
   }
 
-  Future<bool> yoklamaAl(String userID, String eventName) {
-    final DocumentReference eventRef = _firebaseDB.document("Users/$userID");
+  bool yoklamaAl(String userID, String eventName) {
+    try {
+      final DocumentReference eventRef = _firebaseDB.doc("Users/$userID");
 
-    List etkinlik;
-    _firebaseDB.runTransaction((Transaction transaction) async {
-      DocumentSnapshot eventData = await eventRef.get();
-      etkinlik = eventData.data["Etkinlikler"];
-      etkinlik.add(eventName);
-      await transaction
-          .update(eventRef, {"Etkinlikler": etkinlik}).then((onValue) {
-            return true;
-      }).catchError((onError) {
-        return false;
-      });
-    });
+      List etkinlik;
+      _firebaseDB.runTransaction((Transaction transaction) async {
+            DocumentSnapshot eventData = await eventRef.get();
+            Map<String, dynamic> data = eventData.data();
+            etkinlik = data["Etkinlikler"];
+            etkinlik.add(eventName);
+            transaction.update(eventRef, {"Etkinlikler": etkinlik});
+          });
+      return true;
+    } catch (e) {
+      print(e);
+      return false;
+    }
   }
 }

@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
-import 'package:stuventmobil/model/user.dart';
+import 'package:stuventmobil/model/userC.dart';
 import 'package:stuventmobil/services/auth_base.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -8,9 +8,9 @@ class FirebaseAuthService implements AuthBase {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   @override
-  Future<User> currentUser() async {
+  Future<UserC> currentUser() async {
     try {
-      FirebaseUser user = await _firebaseAuth.currentUser();
+      User user = _firebaseAuth.currentUser;
       return _userFromFirebase(user);
     } catch (e) {
       print("HATA CURRENT USER" + e.toString());
@@ -18,11 +18,11 @@ class FirebaseAuthService implements AuthBase {
     }
   }
 
-  User _userFromFirebase(FirebaseUser user) {
+  UserC _userFromFirebase(User user) {
     if (user == null) {
       return null;
     } else {
-      return User(
+      return UserC(
           userID: user.uid,
           email: user.email,
           userName: user.displayName,
@@ -45,18 +45,21 @@ class FirebaseAuthService implements AuthBase {
   }
 
   @override
-  Future<User> signInWithGoogle() async {
+  Future<UserC> signInWithGoogle() async {
     GoogleSignIn _googleSignIn = GoogleSignIn();
     GoogleSignInAccount _googleUser = await _googleSignIn.signIn();
 
     if (_googleUser != null) {
       GoogleSignInAuthentication _googleAuth = await _googleUser.authentication;
       if (_googleAuth.idToken != null && _googleAuth.accessToken != null) {
-        AuthResult sonuc = await _firebaseAuth.signInWithCredential(
-            GoogleAuthProvider.getCredential(
-                idToken: _googleAuth.idToken,
-                accessToken: _googleAuth.accessToken));
-        FirebaseUser _user = sonuc.user;
+        final GoogleAuthCredential credential = GoogleAuthProvider.credential(
+          accessToken: _googleAuth.accessToken,
+          idToken: _googleAuth.idToken,
+        );
+        UserCredential sonuc =
+            await _firebaseAuth.signInWithCredential(credential);
+
+        User _user = sonuc.user;
         return _userFromFirebase(_user);
       } else {
         return null;
@@ -67,12 +70,12 @@ class FirebaseAuthService implements AuthBase {
   }
 
   @override
-  Future<User> createUserWithEmailandPassword(String name, String lastname,
+  Future<UserC> createUserWithEmailandPassword(String name, String lastname,
       String mail, String password, bool superUser) async {
-    AuthResult sonuc = await _firebaseAuth.createUserWithEmailAndPassword(
+    UserCredential sonuc = await _firebaseAuth.createUserWithEmailAndPassword(
         email: mail, password: password);
     List<String> etkinlikler = [];
-    return User(
+    return UserC(
         userID: sonuc.user.uid,
         email: mail,
         userName: name,
@@ -82,26 +85,20 @@ class FirebaseAuthService implements AuthBase {
   }
 
   @override
-  Future<User> signInWithEmailandPassword(String email, String sifre) async {
-    AuthResult sonuc = await _firebaseAuth.signInWithEmailAndPassword(
+  Future<UserC> signInWithEmailandPassword(String email, String sifre) async {
+    UserCredential sonuc = await _firebaseAuth.signInWithEmailAndPassword(
         email: email, password: sifre);
     return _userFromFirebase(sonuc.user);
   }
 
   Future<bool> sifreGuncelle(String password) async {
     try {
-      await _firebaseAuth.currentUser().then((user) async {
-        await user.updatePassword(password).then((a) {
-          return true;
-        }).catchError((e) {
-          print("Şifre güncellenirken hata oluştu $e");
-          signOut();
-          return false;
-        });
+      User user = _firebaseAuth.currentUser;
+      await user.updatePassword(password).then((a) {
+        return true;
       }).catchError((e) {
-        print("Kullanıcı getirilirken hata oluştu\n");
-        print("Yeni şifreniz alanı boş geçilemez\n");
-        print("Hata: " + e.toString());
+        print("Şifre güncellenirken hata oluştu $e");
+        signOut();
         return false;
       });
     } catch (e) {
@@ -111,13 +108,12 @@ class FirebaseAuthService implements AuthBase {
   }
 
   Future<bool> sendPasswordResetEmail(String mail) async {
-    try{
+    try {
       await _firebaseAuth
           .sendPasswordResetEmail(email: mail)
           .then((value) => true)
           .catchError((onError) => false);
-    }
-    catch (e) {
+    } catch (e) {
       print("sendPasswordResetEmail hata: " + e.toString());
       return false;
     }

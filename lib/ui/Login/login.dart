@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:stuventmobil/app/exceptions.dart';
 import 'package:stuventmobil/common_widget/platform_duyarli_alert_dialog.dart';
+import 'package:stuventmobil/model/userC.dart';
 import 'package:stuventmobil/ui/Login/new_User.dart';
 import 'package:stuventmobil/viewmodel/user_model.dart';
 
@@ -191,13 +192,25 @@ class _LoginState extends State<Login> {
       });
       final _userModel = Provider.of<UserModel>(context, listen: false);
       try {
-        await _userModel.signInWithEmailandPassword(mail, password);
+        UserC _user = await _userModel.signInWithEmailandPassword(mail, password);
+        if(_user == null){
+          setState(() {
+            result = "Şifre hata";
+          });
+          PlatformDuyarliAlertDialog(
+            baslik: "Oturum Açma HATA",
+            icerik: "E-posta veya şifre hatalı",
+            anaButonYazisi: "Tamam",
+          ).goster(context);
+        }
+
       } on PlatformException catch (e) {
         PlatformDuyarliAlertDialog(
           baslik: "Oturum Açma HATA",
           icerik: Exceptions.goster(e.code),
           anaButonYazisi: "Tamam",
         ).goster(context);
+        debugPrint("Code: "+ e.code);
       }
     }
   }

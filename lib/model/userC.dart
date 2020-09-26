@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class User {
+class UserC {
   String userID;
   String email;
   String userName;
@@ -9,7 +9,7 @@ class User {
   bool superUser = false;
   List<dynamic> etkinlikler;
 
-  User(
+  UserC(
       {@required this.userID,
       @required this.email,
       this.userName,
@@ -28,7 +28,7 @@ class User {
     };
   }
 
-  User.userfromMap(Map<String, dynamic> map)
+  UserC.userfromMap(Map<String, dynamic> map)
       : userID = map['UserID'],
         email = map['E-mail'],
         userName = map['Ad'],
@@ -37,7 +37,7 @@ class User {
         etkinlikler = map["Etkinlikler"];
   //profilURL = map['profilURL'],
 
-  User.idveResim({@required this.userID, @required this.profilURL});
+  UserC.idveResim({@required this.userID, @required this.profilURL});
 
   @override
   String toString() {

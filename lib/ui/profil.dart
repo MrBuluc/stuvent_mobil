@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:stuventmobil/app/exceptions.dart';
 import 'package:stuventmobil/common_widget/platform_duyarli_alert_dialog.dart';
-import 'package:stuventmobil/model/user.dart';
+import 'package:stuventmobil/model/userC.dart';
 import 'package:stuventmobil/ui/Generate_Event/GeneratEvent.dart';
 import 'package:stuventmobil/ui/Generate_Notification/GenerateNotification.dart';
 import 'package:stuventmobil/viewmodel/user_model.dart';
@@ -175,7 +175,7 @@ class _ProfilState extends State<Profil> {
   }
 
   Future<void> read(UserModel userModel) async {
-    User user = await userModel.currentUser();
+    UserC user = await userModel.currentUser();
     setState(() {
       name = user.lastName == null
           ? "${user.userName}"

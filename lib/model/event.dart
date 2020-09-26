@@ -25,7 +25,7 @@ class Event {
 
 final List<Event> events = [];
 
-final Firestore _firestore = Firestore.instance;
+final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
 String ad, konum, url;
 List categoryList;
@@ -35,17 +35,18 @@ Future<void> read() async {
   events.clear();
 
   QuerySnapshot querySnapshot =
-      await _firestore.collection("Etkinlikler").getDocuments();
+      await _firestore.collection("Etkinlikler").get();
 
-  List<DocumentSnapshot> documentSnapshotList = querySnapshot.documents;
+  List<DocumentSnapshot> documentSnapshotList = querySnapshot.docs;
 
   documentSnapshotList.forEach((documentSnapshot) {
     try{
-      ad = documentSnapshot.data["Etkinlik Adı"];
-      konum = documentSnapshot.data["Etkinlik Konumu"];
-      url = documentSnapshot.data["Etkinlik Photo Url"];
-      categoryList = documentSnapshot.data["category"];
-      docMap = documentSnapshot.data["Dosyalar"];
+      Map<String, dynamic> data = documentSnapshot.data();
+      ad = data["Etkinlik Adı"];
+      konum = data["Etkinlik Konumu"];
+      url = data["Etkinlik Photo Url"];
+      categoryList = data["category"];
+      docMap = data["Dosyalar"];
 
 
       Event event = new Event(

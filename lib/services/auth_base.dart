@@ -1,10 +1,10 @@
-import 'package:stuventmobil/model/user.dart';
+import 'package:stuventmobil/model/userC.dart';
 
 abstract class AuthBase {
-  Future<User> currentUser();
+  Future<UserC> currentUser();
   Future<bool> signOut();
-  Future<User> signInWithGoogle();
-  Future<User> signInWithEmailandPassword(String email, String sifre);
-  Future<User> createUserWithEmailandPassword(String name, String lastname,
+  Future<UserC> signInWithGoogle();
+  Future<UserC> signInWithEmailandPassword(String email, String sifre);
+  Future<UserC> createUserWithEmailandPassword(String name, String lastname,
       String mail, String password, bool superUser);
 }

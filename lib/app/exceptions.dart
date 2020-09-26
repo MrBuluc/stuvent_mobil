@@ -13,6 +13,9 @@ class Exceptions {
       case "ERROR_NETWORK_REQUEST_FAILED":
         return "İnternet bağlantınızı kontrol edin";
 
+      case "ERROR_WRONG_PASSWORD":
+        return "Yanlış şifre";
+
       default:
         return "Bir hata olustu $hataKodu";
     }

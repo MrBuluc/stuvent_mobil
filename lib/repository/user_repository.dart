@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:stuventmobil/locator.dart';
-import 'package:stuventmobil/model/user.dart';
+import 'package:stuventmobil/model/userC.dart';
 import 'package:stuventmobil/services/auth_base.dart';
 import 'package:stuventmobil/services/bildirim_gonderme_servis.dart';
 import 'package:stuventmobil/services/firebase_auth_service.dart';
@@ -17,8 +17,8 @@ class UserRepository implements AuthBase {
       locator<BildirimGondermeServis>();
 
   @override
-  Future<User> currentUser() async {
-    User _user = await _firebaseAuthService.currentUser();
+  Future<UserC> currentUser() async {
+    UserC _user = await _firebaseAuthService.currentUser();
     if (_user != null)
       return await _firestoreDBService.readUser(_user.userID);
     else
@@ -31,8 +31,8 @@ class UserRepository implements AuthBase {
   }
 
   @override
-  Future<User> signInWithGoogle() async {
-    User _user = await _firebaseAuthService.signInWithGoogle();
+  Future<UserC> signInWithGoogle() async {
+    UserC _user = await _firebaseAuthService.signInWithGoogle();
     if (_user != null) {
       Map<String, dynamic> data = _user.toMap();
       bool _sonuc =
@@ -48,9 +48,9 @@ class UserRepository implements AuthBase {
   }
 
   @override
-  Future<User> createUserWithEmailandPassword(String name, String lastname,
+  Future<UserC> createUserWithEmailandPassword(String name, String lastname,
       String mail, String password, bool superUser) async {
-    User _user = await _firebaseAuthService.createUserWithEmailandPassword(
+    UserC _user = await _firebaseAuthService.createUserWithEmailandPassword(
         name, lastname, mail, password, superUser);
     Map<String, dynamic> data = _user.toMap();
 
@@ -64,8 +64,8 @@ class UserRepository implements AuthBase {
   }
 
   @override
-  Future<User> signInWithEmailandPassword(String email, String sifre) async {
-    User _user =
+  Future<UserC> signInWithEmailandPassword(String email, String sifre) async {
+    UserC _user =
         await _firebaseAuthService.signInWithEmailandPassword(email, sifre);
 
     return await _firestoreDBService.readUser(_user.userID);
@@ -108,7 +108,7 @@ class UserRepository implements AuthBase {
   }
 
   Future<bool> yoklamaAl(String userID, String eventName) async {
-    return await _firestoreDBService.yoklamaAl(userID, eventName);
+    return  _firestoreDBService.yoklamaAl(userID, eventName);
   }
 
   Future<bool> updatePassword(String password) async {

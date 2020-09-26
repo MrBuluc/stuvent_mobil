@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:stuventmobil/styleguide.dart';
 import '../../model/event.dart';
 
 class EventWidget extends StatefulWidget {

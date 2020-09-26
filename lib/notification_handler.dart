@@ -191,6 +191,7 @@ class NotificationHandler {
       return filePath;
     } catch (e) {
       print(" _downloadAndSaveFile Hata: $e");
+      return null;
     }
   }
 }

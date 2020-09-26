@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:stuventmobil/viewmodel/user_model.dart';
 import 'package:stuventmobil/app/exceptions.dart';
 import 'package:stuventmobil/common_widget/platform_duyarli_alert_dialog.dart';
-import 'package:stuventmobil/model/user.dart';
+import 'package:stuventmobil/model/userC.dart';
 
 class NewUser extends StatefulWidget {
   @override
@@ -133,7 +133,7 @@ class _NewUserState extends State<NewUser> {
 
       final _userModel = Provider.of<UserModel>(context, listen: false);
       try {
-        User _user = await _userModel.createUserWithEmailandPassword(
+        UserC _user = await _userModel.createUserWithEmailandPassword(
             name, lastname, mail, password, false);
         if (_user != null) {
           setState(() {
