@@ -166,16 +166,6 @@ class UserModel with ChangeNotifier implements AuthBase {
     }
   }
 
-  Future<bool> eventDel(String document) async {
-    try {
-      bool sonuc = await _userRepository.eventDel(document);
-      return sonuc;
-    } catch (e) {
-      print("user_model hata: " + e.toString());
-      return false;
-    }
-  }
-
   Future<List<String>> getEtkinlikler() async {
     try {
       List<String> etkinlikler = await _userRepository.getEtkinlikler();
@@ -231,5 +221,43 @@ class UserModel with ChangeNotifier implements AuthBase {
   @override
   String toString() {
     return 'UserModel{_state: $_state, _user: $_user}';
+  }
+
+  deleteFile(String anaKlasor, String etkinlikAdi, String fileName) async {
+    try {
+      state = ViewState.Busy;
+      bool sonuc =
+          await _userRepository.deleteFile(anaKlasor, etkinlikAdi, fileName);
+      return sonuc;
+    } catch (e) {
+      print("user_model hata: " + e.toString());
+      return false;
+    } finally {
+      state = ViewState.Idle;
+    }
+  }
+
+  Future<bool> delEvent(String anaKlasor, String etkinlikAdi) async {
+    try {
+      state = ViewState.Busy;
+      bool sonuc =
+          await _userRepository.delEvent(anaKlasor, etkinlikAdi);
+      return sonuc;
+    } catch (e) {
+      print("user_model hata: " + e.toString());
+      return false;
+    } finally {
+      state = ViewState.Idle;
+    }
+  }
+
+  Future<bool> eventDel(String document) async {
+    try {
+      bool sonuc = await _userRepository.eventDel(document);
+      return sonuc;
+    } catch (e) {
+      print("user_model hata: " + e.toString());
+      return false;
+    }
   }
 }

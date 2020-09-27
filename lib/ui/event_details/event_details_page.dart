@@ -78,7 +78,18 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                                 debugPrint("Could not launch $docMap[keys]");
                               }
                             },
-                            //onLongPress: ,
+                            onLongPress: () async {
+                              if (superU) {
+                                _areYouSureforDelete(context, _userModel, keys);
+                              } else {
+                                PlatformDuyarliAlertDialog(
+                                  baslik: "Erişim Hatası",
+                                  icerik:
+                                      "Dosyayı kaldırmak için yetkili değilsiniz",
+                                  anaButonYazisi: "Tamam",
+                                ).goster(context);
+                              }
+                            },
                             child: Text(
                               keys,
                               style:
@@ -145,8 +156,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                   textColor: Colors.white,
                   splashColor: Colors.blueGrey,
                   onPressed: () {
-                    if(!_pickFileInProgress)
-                        _pickDocument(context, _userModel);
+                    if (!_pickFileInProgress)
+                      _pickDocument(context, _userModel);
                   },
                   child: Text(
                     _pickFileInProgress ? "Dosya Yükleniyor" : "Dosya Paylaş",
@@ -240,36 +251,96 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     ).goster(context);
 
     if (sonuc) {
-      _eventDel(context, userModel, document);
+      _delEvent(context, userModel, document);
     }
   }
 
-  Future<void> _eventDel(
+  Future<void> _delEvent(
       BuildContext context, UserModel userModel, String document) async {
     try {
-      bool sonuc = await userModel.eventDel(document);
-      if (sonuc == true || sonuc == null) {
-        final sonuc1 = await PlatformDuyarliAlertDialog(
-          baslik: "Etkinlik Kaldırıldı",
-          icerik: "Etkinlik başarıyla kaldırıldı",
-          anaButonYazisi: "Tamam",
-        ).goster(context);
-        if (sonuc1) {
-          Navigator.pop(context);
+      await userModel
+          .delEvent("Etkinlikler", widget.event.title)
+          .then((value) async {
+        bool sonuc = await userModel.eventDel(document);
+        if (sonuc == true || sonuc == null) {
+          final sonuc1 = await PlatformDuyarliAlertDialog(
+            baslik: "Etkinlik Kaldırıldı",
+            icerik: "Etkinlik başarıyla kaldırıldı",
+            anaButonYazisi: "Tamam",
+          ).goster(context);
+          if (sonuc1) {
+            Navigator.pop(context);
+          }
+        } else {
+          PlatformDuyarliAlertDialog(
+            baslik: "Etkinlik Kaldırılırken Sorun",
+            icerik: "Etkinlik kaldırılırken bir sorun oluştu ",
+            anaButonYazisi: "Tamam",
+          ).goster(context);
         }
-      } else {
-        PlatformDuyarliAlertDialog(
-          baslik: "Etkinlik Kaldırılırken Sorun",
-          icerik: "Etkinlik kaldırılırken bir sorun oluştu ",
-          anaButonYazisi: "Tamam",
-        ).goster(context);
-      }
+      });
     } catch (e) {
       PlatformDuyarliAlertDialog(
         baslik: "Etkinlik Kaldırılırken Sorun",
         icerik: "Etkinlik kaldırılırken bir sorun oluştu: $e ",
         anaButonYazisi: "Tamam",
       ).goster(context);
+    }
+  }
+
+  Future<void> _areYouSureforDelete(
+      BuildContext context, UserModel userModel, String fileName) async {
+    final sonuc = await PlatformDuyarliAlertDialog(
+      baslik: "Emin Misiniz?",
+      icerik: "Dosyayı kaldırmak istediğinizden emin misiniz?",
+      anaButonYazisi: "Evet",
+      iptalButonYazisi: "Vazgeç",
+    ).goster(context);
+
+    if (sonuc) {
+      _deleteFile(context, userModel, fileName);
+    }
+  }
+
+  Future<void> _deleteFile(
+      BuildContext context, UserModel userModel, String fileName) async {
+    try {
+      docMap.remove(fileName);
+
+      await userModel
+          .deleteFile("Etkinlikler", widget.event.title, fileName)
+          .then((value) {
+        userModel
+            .update("Etkinlikler", widget.event.title, "Dosyalar", docMap)
+            .then((value) {
+          PlatformDuyarliAlertDialog(
+            baslik: "Dosya Kaldırıldı",
+            icerik: "Dosya başarılı bir şekilde kaldırıldı",
+            anaButonYazisi: "Tamam",
+          ).goster(context);
+          setState(() {
+            docMapKeys = docMap.keys.toList();
+          });
+        }).catchError((onError) {
+          PlatformDuyarliAlertDialog(
+            baslik: "Dosya Kaldırılamadı",
+            icerik: "Dosya kaldırılırken bir sorun oluştu\n" +
+                "İnternet bağlantınızı kontrol edin\n" +
+                "Hata: $onError",
+            anaButonYazisi: "Tamam",
+          ).goster(context);
+        });
+      }).catchError((onError) {
+        PlatformDuyarliAlertDialog(
+          baslik: "Dosya Kaldırılamadı",
+          icerik: "Dosya kaldırılırken bir sorun oluştu\n" +
+              "İnternet bağlantınızı kontrol edin\n" +
+              "Hata: $onError",
+          anaButonYazisi: "Tamam",
+        ).goster(context);
+      });
+    } catch (e) {
+      print("deleteFile hata:" + e.toString());
     }
   }
 }

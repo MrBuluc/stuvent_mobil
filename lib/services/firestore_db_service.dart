@@ -97,4 +97,16 @@ class FirestoreDBService implements DBBase {
       return false;
     }
   }
+
+  readFiles(String anaKlasor, String etkinlikAdi) async {
+    DocumentSnapshot _okunanEtkinlik =
+        await _firebaseDB.collection(anaKlasor).doc(etkinlikAdi).get();
+    Map<String, dynamic> _okunanEtkinlikMap = _okunanEtkinlik.data();
+    Map<String, dynamic> _dosyalarMap = _okunanEtkinlikMap["Dosyalar"];
+    List<String> files = [];
+    _dosyalarMap.forEach((key, value) {
+      files.add(key);
+    });
+    return files;
+  }
 }

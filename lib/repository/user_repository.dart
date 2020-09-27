@@ -95,10 +95,6 @@ class UserRepository implements AuthBase {
     return false;
   }
 
-  Future<bool> eventDel(String document) async {
-    return await _firestoreDBService.eventDel(document);
-  }
-
   Future<List<String>> getEtkinlikler() async {
     return await _firestoreDBService.getEtkinlikler();
   }
@@ -117,6 +113,20 @@ class UserRepository implements AuthBase {
 
   Future<bool> generateNotification(String title, String message, String bigText) async {
     return await _bildirimGondermeServis.bigTextBildirimGonder(title, message, bigText);
+  }
+
+  deleteFile(String anaKlasor, String etkinlikAdi, String fileName) async {
+    return await _firebaseStorageService.deleteFile(
+        anaKlasor, etkinlikAdi, fileName);
+  }
+
+  delEvent(String anaKlasor, String etkinlikAdi) async {
+    List<String> files = await _firestoreDBService.readFiles(anaKlasor, etkinlikAdi);
+    return await _firebaseStorageService.delEvent(anaKlasor, etkinlikAdi, files);
+  }
+
+  Future<bool> eventDel(String document) async {
+    return await _firestoreDBService.eventDel(document);
   }
 
   /*Future<String> uploadFile(

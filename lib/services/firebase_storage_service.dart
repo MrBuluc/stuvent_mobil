@@ -22,8 +22,8 @@ class FirebaseStorageService implements StorageBase {
     return url;
   }
 
-  Future<String> uploadFile(String anaKlasor,
-      File dosya, String etkinlikAdi, String dosyaAdi) async {
+  Future<String> uploadFile(
+      String anaKlasor, File dosya, String etkinlikAdi, String dosyaAdi) async {
     _storageReference = _firebaseStorage
         .ref()
         .child(anaKlasor)
@@ -32,5 +32,31 @@ class FirebaseStorageService implements StorageBase {
     var uploadTask = _storageReference.putFile(dosya);
     var url = await (await uploadTask.onComplete).ref.getDownloadURL();
     return url;
+  }
+
+  deleteFile(String anaKlasor, String etkinlikAdi, String dosyaAdi) {
+    _storageReference = _firebaseStorage
+        .ref()
+        .child(anaKlasor)
+        .child(etkinlikAdi)
+        .child(dosyaAdi);
+    _storageReference
+        .delete()
+        .then((value) => true)
+        .catchError((onError) => false);
+    return false;
+  }
+
+  delEvent(String anaKlasor, String etkinlikAdi, List<String> files) async {
+    for(String fileName in files){
+      _storageReference = _firebaseStorage.ref().child(anaKlasor).child(etkinlikAdi).child(fileName);
+      _storageReference
+          .delete()
+          .then((value) => true)
+          .catchError((onError) => false);
+    }
+    _storageReference = _firebaseStorage.ref().child(anaKlasor).child(etkinlikAdi).child("event_photo.png");
+    _storageReference.delete().then((value) => true).catchError((onError) => false);
+    return false;
   }
 }
