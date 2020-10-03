@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:stuventmobil/app/exceptions.dart';
 import 'package:stuventmobil/common_widget/platform_duyarli_alert_dialog.dart';
+import 'package:stuventmobil/common_widget/social_log_in_button.dart';
 import 'package:stuventmobil/model/userC.dart';
 import 'package:stuventmobil/ui/Login/new_User.dart';
 import 'package:stuventmobil/viewmodel/user_model.dart';
@@ -36,11 +37,15 @@ class _LoginState extends State<Login> {
             onPressed: () {
               emailvesifregiris();
             },
-            //backgroundColor: Colors.teal,
             child: Icon(Icons.arrow_forward),
           ),
+          backgroundColor: Colors.grey.shade200,
           appBar: AppBar(
-            title: Center(child: Text("Stuvent Etkinlik Habercisi", style: TextStyle(fontSize: 25),)),
+            title: Center(
+                child: Text(
+              "Stuvent Etkinlik Habercisi",
+              style: TextStyle(fontSize: 25),
+            )),
           ),
           body: Padding(
             padding: EdgeInsets.all(10),
@@ -66,6 +71,7 @@ class _LoginState extends State<Login> {
                     hintStyle: TextStyle(fontSize: 12),
                     labelText: "E-posta adresiniz",
                     border: OutlineInputBorder(),
+
                   ),
                   validator: _emailKontrol,
                   onSaved: (String value) => mail = value,
@@ -93,37 +99,36 @@ class _LoginState extends State<Login> {
                 SizedBox(
                   height: 10,
                 ),
-                RaisedButton(
-                  child: Text(
-                    "Şifemi Unuttum",
-                    style: TextStyle(color: Colors.yellow),
-                  ),
-                  color: Colors.purple,
+                SocialLoginButton(
+                  butonText: "Şifremi Unuttum",
+                  textColor: Colors.yellow,
+                  butonColor: Colors.purple,
                   onPressed: () {
                     _sifremiUnuttum(_userModel);
                   },
+                  butonIcon: Icon(Icons.lock_open),
                 ),
                 SizedBox(
                   height: 10,
                 ),
-                RaisedButton(
-                    child: Text(
-                      "Email ve Sifre ile Yeni Kullanıcı Oluştur",
-                    ),
-                    color: Colors.blue,
-                    onPressed: (() => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => NewUser()),
-                        ))),
+                SocialLoginButton(
+                  butonText: "Yeni Kullanıcı Oluştur",
+                  butonColor: Colors.blue,
+                  onPressed: (() => Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => NewUser()))),
+                  butonIcon: Icon(Icons.account_circle, size: 35,),
+                ),
                 SizedBox(
                   height: 10,
                 ),
-                RaisedButton(
-                  child: Text("Google ile Giriş"),
-                  color: Colors.red,
+                SocialLoginButton(
+                  butonText: "Google ile Giriş",
+                  textColor: Colors.black,
+                  butonColor: Colors.white,
                   onPressed: () {
                     gSignIn(context);
                   },
+                  butonIcon: Image.asset("images/google-logo.png"),
                 ),
                 SizedBox(
                   height: 10,
