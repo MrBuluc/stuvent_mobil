@@ -196,16 +196,6 @@ class UserModel with ChangeNotifier implements AuthBase {
     }
   }
 
-  Future<bool> updatePassword(String password) async {
-    try {
-      bool sonuc = await _userRepository.updatePassword(password);
-      return sonuc;
-    } catch (e) {
-      print("user_model hata: " + e.toString());
-      return false;
-    }
-  }
-
   Future<bool> generateNotification(
       String title, String message, String bigText) async {
     try {
@@ -254,6 +244,17 @@ class UserModel with ChangeNotifier implements AuthBase {
   Future<bool> eventDel(String document) async {
     try {
       bool sonuc = await _userRepository.eventDel(document);
+      return sonuc;
+    } catch (e) {
+      print("user_model hata: " + e.toString());
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> sifreGuncelle(String password) async {
+    try {
+      bool sonuc = await _userRepository.updatePassword(password);
       return sonuc;
     } catch (e) {
       print("user_model hata: " + e.toString());

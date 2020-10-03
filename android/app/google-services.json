@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "878073458649-nt5hdohqkrs9lue5leh704qticbokp7q.apps.googleusercontent.com",
+          "client_id": "878073458649-59gv2b1tvg0j02rpcasdqfdcgjg2k96g.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "github.io.emirxmertoglu.stuventmobil",
-            "certificate_hash": "91b33205e5abb74034dfbd50df81d8a61fcca780"
+            "certificate_hash": "40fa3243ed17fcf9454c0e39d0657c1f03eeeb29"
           }
         },
         {

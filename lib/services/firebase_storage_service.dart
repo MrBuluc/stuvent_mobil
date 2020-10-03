@@ -8,20 +8,6 @@ class FirebaseStorageService implements StorageBase {
   StorageReference _storageReference;
 
   @override
-  Future<String> uploadPhoto(
-      String userID, String fileType, File yuklenecekDosya) async {
-    _storageReference = _firebaseStorage
-        .ref()
-        .child(userID)
-        .child(fileType)
-        .child("profil_foto.png");
-    var uploadTask = _storageReference.putFile(yuklenecekDosya);
-
-    var url = await (await uploadTask.onComplete).ref.getDownloadURL();
-
-    return url;
-  }
-
   Future<String> uploadFile(
       String anaKlasor, File dosya, String etkinlikAdi, String dosyaAdi) async {
     _storageReference = _firebaseStorage
@@ -34,7 +20,8 @@ class FirebaseStorageService implements StorageBase {
     return url;
   }
 
-  deleteFile(String anaKlasor, String etkinlikAdi, String dosyaAdi) {
+  @override
+  Future<bool> deleteFile(String anaKlasor, String etkinlikAdi, String dosyaAdi) {
     _storageReference = _firebaseStorage
         .ref()
         .child(anaKlasor)
@@ -44,10 +31,11 @@ class FirebaseStorageService implements StorageBase {
         .delete()
         .then((value) => true)
         .catchError((onError) => false);
-    return false;
+    return Future.value(false);
   }
 
-  delEvent(String anaKlasor, String etkinlikAdi, List<String> files) async {
+  @override
+  Future<bool> delFiles(String anaKlasor, String etkinlikAdi, List<String> files) {
     for(String fileName in files){
       _storageReference = _firebaseStorage.ref().child(anaKlasor).child(etkinlikAdi).child(fileName);
       _storageReference
@@ -57,6 +45,6 @@ class FirebaseStorageService implements StorageBase {
     }
     _storageReference = _firebaseStorage.ref().child(anaKlasor).child(etkinlikAdi).child("event_photo.png");
     _storageReference.delete().then((value) => true).catchError((onError) => false);
-    return false;
+    return Future.value(false);
   }
 }

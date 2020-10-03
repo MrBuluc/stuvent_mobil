@@ -195,7 +195,7 @@ class _ProfilState extends State<Profil> {
 
       UserModel _userModel = Provider.of<UserModel>(context, listen: false);
       try{
-        bool sonuc = await _userModel.updatePassword(password);
+        bool sonuc = await _userModel.sifreGuncelle(password);
         if (sonuc== true || sonuc == null) {
           PlatformDuyarliAlertDialog(
             baslik: "Şifreniz Güncellendi :)",

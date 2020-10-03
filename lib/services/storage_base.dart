@@ -1,9 +1,8 @@
 import 'dart:io';
 
 abstract class StorageBase {
-  Future<String> uploadPhoto(
-      String userID,
-      String fileType,
-      File yuklenecekDosya,
-      );
+  Future<String> uploadFile(
+      String anaKlasor, File dosya, String etkinlikAdi, String dosyaAdi);
+  Future<bool> deleteFile(String anaKlasor, String etkinlikAdi, String dosyaAdi);
+  Future<bool> delFiles(String anaKlasor, String etkinlikAdi, List<String> files);
 }

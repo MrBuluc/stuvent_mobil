@@ -122,7 +122,7 @@ class UserRepository implements AuthBase {
 
   delEvent(String anaKlasor, String etkinlikAdi) async {
     List<String> files = await _firestoreDBService.readFiles(anaKlasor, etkinlikAdi);
-    return await _firebaseStorageService.delEvent(anaKlasor, etkinlikAdi, files);
+    return await _firebaseStorageService.delFiles(anaKlasor, etkinlikAdi, files);
   }
 
   Future<bool> eventDel(String document) async {

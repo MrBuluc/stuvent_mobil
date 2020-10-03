@@ -16,9 +16,10 @@ class FirestoreDBService implements DBBase {
     return _okunanUserNesnesi;
   }
 
+  @override
   Future<bool> update(String collection, String documentName, String alan,
-      dynamic newData) async {
-    await _firebaseDB
+      dynamic newData){
+    _firebaseDB
         .collection(collection)
         .doc(documentName)
         .update({alan: newData}).then((value) {
@@ -27,15 +28,7 @@ class FirestoreDBService implements DBBase {
       print("db_service update hata: " + onError.toString());
       return false;
     });
-  }
-
-  @override
-  Future<bool> updateProfilFoto(String userID, String profilFotoURL) async {
-    await _firebaseDB
-        .collection("users")
-        .doc(userID)
-        .update({'profilURL': profilFotoURL});
-    return true;
+    return Future.value(false);
   }
 
   @override
@@ -64,6 +57,7 @@ class FirestoreDBService implements DBBase {
     return true;
   }
 
+  @override
   Future<List<String>> getEtkinlikler() async {
     QuerySnapshot querySnapshot =
         await _firebaseDB.collection("Etkinlikler").get();
@@ -79,7 +73,8 @@ class FirestoreDBService implements DBBase {
     return etkinlikler;
   }
 
-  bool yoklamaAl(String userID, String eventName) {
+  @override
+  Future<bool> yoklamaAl(String userID, String eventName) {
     try {
       final DocumentReference eventRef = _firebaseDB.doc("Users/$userID");
 
@@ -91,14 +86,15 @@ class FirestoreDBService implements DBBase {
             etkinlik.add(eventName);
             transaction.update(eventRef, {"Etkinlikler": etkinlik});
           });
-      return true;
+      return Future.value(true);
     } catch (e) {
       print(e);
-      return false;
+      return Future.value(false);
     }
   }
 
-  readFiles(String anaKlasor, String etkinlikAdi) async {
+  @override
+  Future<List<String>> readFiles(String anaKlasor, String etkinlikAdi) async {
     DocumentSnapshot _okunanEtkinlik =
         await _firebaseDB.collection(anaKlasor).doc(etkinlikAdi).get();
     Map<String, dynamic> _okunanEtkinlikMap = _okunanEtkinlik.data();

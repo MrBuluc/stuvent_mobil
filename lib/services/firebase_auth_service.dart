@@ -91,6 +91,7 @@ class FirebaseAuthService implements AuthBase {
     return _userFromFirebase(sonuc.user);
   }
 
+  @override
   Future<bool> sifreGuncelle(String password) async {
     try {
       User user = _firebaseAuth.currentUser;
@@ -107,6 +108,7 @@ class FirebaseAuthService implements AuthBase {
     }
   }
 
+  @override
   Future<bool> sendPasswordResetEmail(String mail) async {
     try {
       await _firebaseAuth
