@@ -1,22 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:qr_flutter/src/qr_image.dart';
 import 'dart:ui';
 import 'package:flutter/rendering.dart';
 
 class GenerateScreen extends StatefulWidget {
   String text;
+
   GenerateScreen(this.text);
+
   @override
   State<StatefulWidget> createState() => GenerateScreenState(text);
-
-
-
-
 }
 
 class GenerateScreenState extends State<GenerateScreen> {
-
   String _dataString;
+
   GenerateScreenState(this._dataString);
 
   // static const double _topSectionTopPadding = 50.0;
@@ -24,6 +23,7 @@ class GenerateScreenState extends State<GenerateScreen> {
   // static const double _topSectionHeight = 50.0;
 
   GlobalKey globalKey = new GlobalKey();
+
   //String _inputErrorText;
   //final TextEditingController _textController =  TextEditingController();
 
@@ -38,13 +38,14 @@ class GenerateScreenState extends State<GenerateScreen> {
   }
 
   _contentWidget() {
-    final bodyHeight = MediaQuery.of(context).size.height - MediaQuery.of(context).viewInsets.bottom;
-    return  Container(
+    final bodyHeight = MediaQuery.of(context).size.height -
+        MediaQuery.of(context).viewInsets.bottom;
+    return Container(
       color: const Color(0xFFFFFFFF),
-      child:  Column(
+      child: Column(
         children: <Widget>[
           Expanded(
-            child:  Center(
+            child: Center(
               child: RepaintBoundary(
                 key: globalKey,
                 child: QrImage(

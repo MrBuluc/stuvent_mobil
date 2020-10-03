@@ -13,7 +13,6 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-
   final formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -26,29 +25,38 @@ class _LoginState extends State<Login> {
     UserModel _userModel = Provider.of<UserModel>(context);
     return Theme(
         data: Theme.of(context).copyWith(
-            accentColor: Colors.green,
-            hintColor: Colors.indigo,
-            errorColor: Colors.red,
-            primaryColor: Colors.teal),
+          accentColor: Colors.green,
+          hintColor: Colors.indigo,
+          errorColor: Colors.red,
+          //primaryColor: Colors.teal),
+        ),
         child: Scaffold(
           key: _scaffoldKey,
           floatingActionButton: FloatingActionButton(
             onPressed: () {
               emailvesifregiris();
             },
-            backgroundColor: Colors.teal,
+            //backgroundColor: Colors.teal,
             child: Icon(Icons.arrow_forward),
           ),
           appBar: AppBar(
-            title: Text("Üye E-posta ve Şifre ile Giriş"),
+            title: Center(child: Text("Stuvent Etkinlik Habercisi", style: TextStyle(fontSize: 25),)),
           ),
           body: Padding(
             padding: EdgeInsets.all(10),
             child: Form(
               key: formKey,
               child: ListView(children: <Widget>[
+                Center(
+                    child: Text(
+                  "Üye E-posta ve Şifre ile Giriş",
+                  style: TextStyle(
+                      fontSize: 23,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.teal),
+                )),
                 SizedBox(
-                  height: 10,
+                  height: 25,
                 ),
                 TextFormField(
                   keyboardType: TextInputType.emailAddress,
@@ -136,19 +144,18 @@ class _LoginState extends State<Login> {
 
   Future<void> _sifremiUnuttum(UserModel userModel) async {
     formKey.currentState.save();
-    if(mail == ""){
+    if (mail == "") {
       setState(() {
         result = "E-posta alanını boş bırakamazsınız";
       });
-    }
-    else{
+    } else {
       try {
         bool sonuc = await userModel.sendPasswordResetEmail(mail);
-        if (sonuc== true || sonuc == null) {
+        if (sonuc == true || sonuc == null) {
           PlatformDuyarliAlertDialog(
             baslik: "Şifre Sıfırlama Mailı Gönderildi",
             icerik:
-            "Şifre sıfırlama mailı başarılı bir şekilde $mail adresine gönderildi",
+                "Şifre sıfırlama mailı başarılı bir şekilde $mail adresine gönderildi",
             anaButonYazisi: "Tamam",
           ).goster(context);
         } else {
@@ -192,8 +199,9 @@ class _LoginState extends State<Login> {
       });
       final _userModel = Provider.of<UserModel>(context, listen: false);
       try {
-        UserC _user = await _userModel.signInWithEmailandPassword(mail, password);
-        if(_user == null){
+        UserC _user =
+            await _userModel.signInWithEmailandPassword(mail, password);
+        if (_user == null) {
           setState(() {
             result = "Şifre hata";
           });
@@ -203,14 +211,13 @@ class _LoginState extends State<Login> {
             anaButonYazisi: "Tamam",
           ).goster(context);
         }
-
       } on PlatformException catch (e) {
         PlatformDuyarliAlertDialog(
           baslik: "Oturum Açma HATA",
           icerik: Exceptions.goster(e.code),
           anaButonYazisi: "Tamam",
         ).goster(context);
-        debugPrint("Code: "+ e.code);
+        debugPrint("Code: " + e.code);
       }
     }
   }
