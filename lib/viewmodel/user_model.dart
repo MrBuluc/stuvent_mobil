@@ -81,48 +81,26 @@ class UserModel with ChangeNotifier implements AuthBase {
   @override
   Future<UserC> createUserWithEmailandPassword(String name, String lastname,
       String mail, String password, bool superUser) async {
-    if (_emailSifreKontrol(mail, password)) {
-      try {
-        state = ViewState.Busy;
-        _user = await _userRepository.createUserWithEmailandPassword(
-            name, lastname, mail, password, superUser);
-
-        return _user;
-      } finally {
-        state = ViewState.Idle;
-      }
-    } else
-      return null;
-  }
-
-  @override
-  Future<UserC> signInWithEmailandPassword(String email, String sifre) async {
     try {
-      if (_emailSifreKontrol(email, sifre)) {
-        state = ViewState.Busy;
-        _user = await _userRepository.signInWithEmailandPassword(email, sifre);
-        return _user;
-      } else
-        return null;
+      state = ViewState.Busy;
+      _user = await _userRepository.createUserWithEmailandPassword(
+          name, lastname, mail, password, superUser);
+
+      return _user;
     } finally {
       state = ViewState.Idle;
     }
   }
 
-  bool _emailSifreKontrol(String email, String sifre) {
-    var sonuc = true;
-
-    if (sifre.length < 6) {
-      sifreHataMesaji = "En az 6 karakter olmalı";
-      sonuc = false;
-    } else
-      sifreHataMesaji = null;
-    if (!email.contains('@')) {
-      emailHataMesaji = "Geçersiz email adresi";
-      sonuc = false;
-    } else
-      emailHataMesaji = null;
-    return sonuc;
+  @override
+  Future<UserC> signInWithEmailandPassword(String email, String sifre) async {
+    try {
+      state = ViewState.Busy;
+      _user = await _userRepository.signInWithEmailandPassword(email, sifre);
+      return _user;
+    } finally {
+      state = ViewState.Idle;
+    }
   }
 
   Future<String> uploadFile(
@@ -230,8 +208,7 @@ class UserModel with ChangeNotifier implements AuthBase {
   Future<bool> delEvent(String anaKlasor, String etkinlikAdi) async {
     try {
       state = ViewState.Busy;
-      bool sonuc =
-          await _userRepository.delEvent(anaKlasor, etkinlikAdi);
+      bool sonuc = await _userRepository.delEvent(anaKlasor, etkinlikAdi);
       return sonuc;
     } catch (e) {
       print("user_model hata: " + e.toString());

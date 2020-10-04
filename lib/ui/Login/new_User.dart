@@ -138,7 +138,7 @@ class _NewUserState extends State<NewUser> {
         if (_user != null) {
           setState(() {
             result = "Üye Kayıt Edildi\n "
-                "Önceki ekrana geri dönerek E-posta ve Şifreniz ile giriş yapabilirsiniz";
+                "Uygulamamızın keyfini çıkarabilirsiniz 🥳";
           });
         } else {
           setState(() {
