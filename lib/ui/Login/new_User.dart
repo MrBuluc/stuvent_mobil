@@ -136,6 +136,14 @@ class _NewUserState extends State<NewUser> {
         UserC _user = await _userModel.createUserWithEmailandPassword(
             name, lastname, mail, password, false);
         if (_user != null) {
+          var sonuc = await PlatformDuyarliAlertDialog(
+            baslik: "Kaydınız Başarıyla Gerçekleştirildi :)",
+            icerik: "Uygulamamızın keyfini çıkarabilirsiniz 🥳",
+            anaButonYazisi: "Tamam",
+          ).goster(context);
+          if (sonuc) {
+            Navigator.pop(context);
+          }
           setState(() {
             result = "Üye Kayıt Edildi\n "
                 "Uygulamamızın keyfini çıkarabilirsiniz 🥳";
