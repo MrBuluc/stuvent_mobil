@@ -1,12 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:stuventmobil/app/exceptions.dart';
 import 'package:stuventmobil/common_widget/platform_duyarli_alert_dialog.dart';
 import 'package:stuventmobil/model/userC.dart';
 import 'package:stuventmobil/ui/Generate_Event/GeneratEvent.dart';
 import 'package:stuventmobil/ui/Generate_Notification/GenerateNotification.dart';
+import 'package:stuventmobil/ui/Profil/update_password_page.dart';
 import 'package:stuventmobil/viewmodel/user_model.dart';
 
 class Profil extends StatefulWidget {
@@ -15,7 +14,6 @@ class Profil extends StatefulWidget {
 }
 
 class _ProfilState extends State<Profil> {
-
   final formKey = GlobalKey<FormState>();
 
   String name = "", mail = "", password;
@@ -77,32 +75,16 @@ class _ProfilState extends State<Profil> {
                 SizedBox(
                   height: 10,
                 ),
-                TextFormField(
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.lock),
-                    hintText: "Yeni Şifre",
-                    labelText: "Yeni Şifreniz",
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (String value) {
-                    if (value.length < 6) {
-                      return "En az 6 karakter gerekli";
-                    }
-                    return null;
-                  },
-                  onSaved: (String value) => password = value,
-                ),
-                SizedBox(
-                  height: 10,
-                ),
                 RaisedButton(
                   child: Text(
                     "Şifremi Güncelle",
                     style: TextStyle(color: Colors.white),
                   ),
                   onPressed: () {
-                    _sifremiGuncelle(context);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                        builder: (context) => UpdatePasswordPage()));
                   },
                   color: Colors.pink,
                 ),
@@ -135,7 +117,8 @@ class _ProfilState extends State<Profil> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => GenerateNotification()),
+                        MaterialPageRoute(
+                            builder: (context) => GenerateNotification()),
                       );
                     },
                     color: Colors.blue,
@@ -185,57 +168,6 @@ class _ProfilState extends State<Profil> {
     });
   }
 
-  Future<void> _sifremiGuncelle(BuildContext context) async {
-    setState(() {
-      result = "Şifre Güncelleniyor...";
-    });
-
-    if (formKey.currentState.validate()) {
-      formKey.currentState.save();
-
-      UserModel _userModel = Provider.of<UserModel>(context, listen: false);
-      try{
-        bool sonuc = await _userModel.sifreGuncelle(password);
-        if (sonuc== true || sonuc == null) {
-          PlatformDuyarliAlertDialog(
-            baslik: "Şifreniz Güncellendi :)",
-            icerik: "Şifreniz Başarılı Bir Şekilde Güncellendi",
-            anaButonYazisi: "Tamam",
-          ).goster(context);
-          setState(() {
-            result = "Şifre Güncellendi";
-          });
-        } else {
-          final sonuc = await PlatformDuyarliAlertDialog(
-            baslik: "Şifreniz Güncellenemedi :(",
-            icerik: "Şifreniz Güncellenirken Bir Sorun Oluştu\n" +
-                "Yeni şifreniz alanı boş geçilemez\n" +
-                "Tekrar giriş yapmanız gerekiyor",
-            anaButonYazisi: "Tamam",
-          ).goster(context);
-          setState(() {
-            result = "Şifre güncellenirken hata oluştu";
-            _userModel.signOut();
-          });
-          if(sonuc){
-            Navigator.pop(context);
-          }
-        }
-      }on PlatformException catch (e) {
-        PlatformDuyarliAlertDialog(
-          baslik: "Şifre Güncelleme HATA",
-          icerik: Exceptions.goster(e.code),
-          anaButonYazisi: 'Tamam',
-        ).goster(context);
-      }
-    } else {
-      setState(() {
-        otomatikKontrol = true;
-        result = "Girilen Bilgileri Doğru giriniz";
-      });
-    }
-  }
-
   Future<void> _cikisyap(BuildContext context, UserModel userModel) async {
     try {
       await userModel.signOut();
@@ -253,7 +185,8 @@ class _ProfilState extends State<Profil> {
     }
   }
 
-  Future<void> _cikisIcinOnayIste(BuildContext context, UserModel userModel) async {
+  Future<void> _cikisIcinOnayIste(
+      BuildContext context, UserModel userModel) async {
     final sonuc = await PlatformDuyarliAlertDialog(
       baslik: "Emin Misiniz?",
       icerik: "Oturumu kapatmak istediğinizden emin misiniz?",

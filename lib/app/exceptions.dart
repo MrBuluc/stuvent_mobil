@@ -16,6 +16,9 @@ class Exceptions {
       case "ERROR_WRONG_PASSWORD":
         return "Yanlış şifre";
 
+      case "[firebase_auth/wrong-password] The password is invalid or the user does not have a password.":
+        return "Şifre yanlış veya kullanıcının şifresi yok";
+
       default:
         return "Bir hata olustu $hataKodu";
     }
