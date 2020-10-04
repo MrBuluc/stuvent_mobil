@@ -71,7 +71,6 @@ class _LoginState extends State<Login> {
                     hintStyle: TextStyle(fontSize: 12),
                     labelText: "E-posta adresiniz",
                     border: OutlineInputBorder(),
-
                   ),
                   validator: _emailKontrol,
                   onSaved: (String value) => mail = value,
@@ -116,7 +115,10 @@ class _LoginState extends State<Login> {
                   butonColor: Colors.blue,
                   onPressed: (() => Navigator.push(context,
                       MaterialPageRoute(builder: (context) => NewUser()))),
-                  butonIcon: Icon(Icons.account_circle, size: 35,),
+                  butonIcon: Icon(
+                    Icons.account_circle,
+                    size: 35,
+                  ),
                 ),
                 SizedBox(
                   height: 10,
@@ -206,23 +208,23 @@ class _LoginState extends State<Login> {
       try {
         UserC _user =
             await _userModel.signInWithEmailandPassword(mail, password);
-        if (_user == null) {
-          setState(() {
-            result = "Şifre hata";
-          });
-          PlatformDuyarliAlertDialog(
-            baslik: "Oturum Açma HATA",
-            icerik: "E-posta veya şifre hatalı",
-            anaButonYazisi: "Tamam",
-          ).goster(context);
-        }
+        // if (_user == null) {
+        //   setState(() {
+        //     result = "Şifre hata";
+        //   });
+        //   PlatformDuyarliAlertDialog(
+        //     baslik: "Oturum Açma HATA",
+        //     icerik: "E-posta veya şifre hatalı",
+        //     anaButonYazisi: "Tamam",
+        //   ).goster(context);
+        // }
       } on PlatformException catch (e) {
-        PlatformDuyarliAlertDialog(
-          baslik: "Oturum Açma HATA",
-          icerik: Exceptions.goster(e.code),
-          anaButonYazisi: "Tamam",
-        ).goster(context);
-        debugPrint("Code: " + e.code);
+        // PlatformDuyarliAlertDialog(
+        //   baslik: "Oturum Açma HATA",
+        //   icerik: Exceptions.goster(e.code),
+        //   anaButonYazisi: "Tamam",
+        // ).goster(context);
+        // debugPrint("Code: " + e.code);
       }
     }
   }
