@@ -1,16 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:stuventmobil/app_state.dart';
 import 'package:stuventmobil/model/category.dart';
 import 'package:stuventmobil/model/event.dart';
+import 'package:stuventmobil/notification_handler.dart';
 import 'package:stuventmobil/styleguide.dart';
 import 'package:stuventmobil/ui/event_details/event_details_page.dart';
 import 'package:stuventmobil/ui/homepage/event_widget.dart';
 import 'package:stuventmobil/ui/homepage/home_page_background.dart';
-import 'package:stuventmobil/app_state.dart';
+
 import 'file:///C:/Users/HAKKICAN/AndroidStudioProjects/stuvent_mobil/lib/ui/Profil/profil.dart';
+
 import 'category_widget.dart';
-import 'package:stuventmobil/notification_handler.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -24,7 +26,6 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     events.clear();
     NotificationHandler().initializeFCMNotification(context);
-
   }
 
   @override
@@ -43,6 +44,7 @@ class _HomePageState extends State<HomePage> {
               ),
               SafeArea(
                 child: SingleChildScrollView(
+                  physics: AlwaysScrollableScrollPhysics(),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
