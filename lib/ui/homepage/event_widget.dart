@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+
 import '../../model/event.dart';
 
 class EventWidget extends StatefulWidget {
-  final  Event event;
+  final Event event;
   const EventWidget({Key key, this.event}) : super(key: key);
 
   @override
@@ -38,51 +39,6 @@ class _EventWidgetState extends State<EventWidget> {
                 ),
               ),
             ),
-            /*Padding(
-              padding: const EdgeInsets.only(top: 8.0, left: 8.0),
-              child: Row(
-                children: <Widget>[
-                  *//*Expanded(
-                    flex: 3,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          widget.event.title,
-                          style: eventTitleTextStyle,
-                        ),
-                        SizedBox(
-                          height: 10.0,
-                        ),
-                        *//**//*FittedBox(
-                          child: Row(
-                            children: <Widget>[
-                              Icon(Icons.location_on),
-                              SizedBox(
-                                width: 5.0,
-                              ),
-                              Text(
-                                widget.event.location,
-                                style: eventLocationTextStyle,
-                              ),
-                            ],
-                          ),
-                        ),*//**//*
-                      ],
-                    ),
-                  ),*//*
-                  Expanded(
-                    flex: 1,
-                    child: Text(
-                      "",
-                      textAlign: TextAlign.right,
-                      style: eventLocationTextStyle.copyWith(
-                          fontWeight: FontWeight.w900),
-                    ),
-                  ),
-                ],
-              ),
-            ),*/
           ],
         ),
       ),
