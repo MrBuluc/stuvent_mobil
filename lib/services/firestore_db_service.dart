@@ -17,8 +17,8 @@ class FirestoreDBService implements DBBase {
   }
 
   @override
-  Future<bool> update(String collection, String documentName, String alan,
-      dynamic newData){
+  Future<bool> update(
+      String collection, String documentName, String alan, dynamic newData) {
     _firebaseDB
         .collection(collection)
         .doc(documentName)
@@ -74,18 +74,29 @@ class FirestoreDBService implements DBBase {
   }
 
   @override
-  Future<bool> yoklamaAl(String userID, String eventName) {
+  Future<bool> yoklamaAl(String userName, String userID, String eventName) {
     try {
-      final DocumentReference eventRef = _firebaseDB.doc("Users/$userID");
+      DocumentReference eventRef = _firebaseDB.doc("Users/$userID");
 
       List etkinlik;
       _firebaseDB.runTransaction((Transaction transaction) async {
-            DocumentSnapshot eventData = await eventRef.get();
-            Map<String, dynamic> data = eventData.data();
-            etkinlik = data["Etkinlikler"];
-            etkinlik.add(eventName);
-            transaction.update(eventRef, {"Etkinlikler": etkinlik});
-          });
+        DocumentSnapshot eventData = await eventRef.get();
+        Map<String, dynamic> data = eventData.data();
+        etkinlik = data["Etkinlikler"];
+        etkinlik.add(eventName);
+        transaction.update(eventRef, {"Etkinlikler": etkinlik});
+      });
+
+      DocumentReference eventRef1 = _firebaseDB.doc("Etkinlikler/$eventName");
+
+      List katilimcilar;
+      _firebaseDB.runTransaction((Transaction transaction) async {
+        DocumentSnapshot eventRefData = await eventRef1.get();
+        Map<String, dynamic> data = eventRefData.data();
+        katilimcilar = data["Katilimcilar"];
+        katilimcilar.add(userName);
+        transaction.update(eventRef1, {"Katilimcilar": katilimcilar});
+      });
       return Future.value(true);
     } catch (e) {
       print(e);

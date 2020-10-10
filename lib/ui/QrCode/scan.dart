@@ -1,11 +1,12 @@
 import 'dart:async';
+
 import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:stuventmobil/viewmodel/user_model.dart';
-import 'package:stuventmobil/common_widget/platform_duyarli_alert_dialog.dart';
 import 'package:stuventmobil/app/exceptions.dart';
+import 'package:stuventmobil/common_widget/platform_duyarli_alert_dialog.dart';
+import 'package:stuventmobil/viewmodel/user_model.dart';
 
 class ScanScreen extends StatefulWidget {
   @override
@@ -29,7 +30,7 @@ class _ScanState extends State<ScanScreen> {
     ..removeWhere((e) => e == BarcodeFormat.unknown);
   List<BarcodeFormat> selectedFormats = [..._possibleFormats];
 
-  Future<void> _scanQR(BuildContext context ,UserModel userModel) async {
+  Future<void> _scanQR(BuildContext context, UserModel userModel) async {
     try {
       var options = ScanOptions(
         strings: {
@@ -74,9 +75,11 @@ class _ScanState extends State<ScanScreen> {
       result = "Yoklama alınıyor...";
     });
 
-    try{
-      bool sonuc = await userModel.yoklamaAl(userModel.user.userID, barcode);
-      if (sonuc== true || sonuc == null) {
+    String userName = userModel.user.userName + " " + userModel.user.lastName;
+    try {
+      bool sonuc =
+          await userModel.yoklamaAl(userName, userModel.user.userID, barcode);
+      if (sonuc == true || sonuc == null) {
         PlatformDuyarliAlertDialog(
           baslik: "Yoklama Alındı",
           icerik: "Yoklama başarılı bir şekilde alındı",
@@ -93,7 +96,7 @@ class _ScanState extends State<ScanScreen> {
           anaButonYazisi: "Tamam",
         ).goster(context);
       }
-    }on PlatformException catch (e) {
+    } on PlatformException catch (e) {
       PlatformDuyarliAlertDialog(
         baslik: "Yoklama Alma HATA",
         icerik: Exceptions.goster(e.code),
@@ -121,7 +124,7 @@ class _ScanState extends State<ScanScreen> {
                     textColor: Colors.white,
                     splashColor: Colors.blueGrey,
                     onPressed: () {
-                      _scanQR(context ,_userModel);
+                      _scanQR(context, _userModel);
                     },
                     child: const Text('START CAMERA SCAN')),
               ),

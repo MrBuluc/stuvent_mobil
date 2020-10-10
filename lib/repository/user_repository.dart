@@ -104,8 +104,9 @@ class UserRepository implements AuthBase {
     return await _firebaseAuthService.sendPasswordResetEmail(mail);
   }
 
-  Future<bool> yoklamaAl(String userID, String eventName) async {
-    return _firestoreDBService.yoklamaAl(userID, eventName);
+  Future<bool> yoklamaAl(
+      String userName, String userID, String eventName) async {
+    return _firestoreDBService.yoklamaAl(userName, userID, eventName);
   }
 
   Future<bool> updatePassword(String password) async {

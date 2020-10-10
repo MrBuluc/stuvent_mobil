@@ -1,11 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-
+import "package:stuventmobil/locator.dart";
 import 'package:stuventmobil/model/userC.dart';
 import 'package:stuventmobil/repository/user_repository.dart';
 import 'package:stuventmobil/services/auth_base.dart';
-import "package:stuventmobil/locator.dart";
 
 enum ViewState { Idle, Busy }
 
@@ -164,9 +163,10 @@ class UserModel with ChangeNotifier implements AuthBase {
     }
   }
 
-  Future<bool> yoklamaAl(String userID, String eventName) async {
+  Future<bool> yoklamaAl(
+      String userName, String userID, String eventName) async {
     try {
-      bool sonuc = await _userRepository.yoklamaAl(userID, eventName);
+      bool sonuc = await _userRepository.yoklamaAl(userName, userID, eventName);
       return sonuc;
     } catch (e) {
       print("user_model hata: " + e.toString());
