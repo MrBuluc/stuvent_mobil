@@ -15,10 +15,11 @@ class BildirimGondermeServis {
     String title = eventMap["Etkinlik Adı"];
     String image_url = eventMap["Etkinlik Photo Url"];
     List<dynamic> categoryList = eventMap["category"];
+    List<dynamic> participants = eventMap["Katilimcilar"];
     Map<String, dynamic> docMap = eventMap["Dosyalar"];
 
     String json =
-        '{"to": "/topics/all", "data": {"title": "$title", "message": "$location", "image-url": "$image_url", "category": "$categoryList", "Dosyalar": "$docMap"}}';
+        '{"to": "/topics/all", "data": {"title": "$title", "message": "$location", "image-url": "$image_url", "category": "$categoryList", "Dosyalar": "$docMap", "Katilimcilar": "$participants"}}';
 
     http.Response response =
         await http.post(endUrl, headers: headers, body: json);
@@ -33,7 +34,8 @@ class BildirimGondermeServis {
     }
   }
 
-  Future<bool> bigTextBildirimGonder(String title, String message, String bigText) async {
+  Future<bool> bigTextBildirimGonder(
+      String title, String message, String bigText) async {
     String endUrl = "https://fcm.googleapis.com/fcm/send";
 
     String stuventFirebaseKey =
@@ -43,7 +45,8 @@ class BildirimGondermeServis {
       "Authorization": "key=$stuventFirebaseKey"
     };
 
-    String json = '{"to": "/topics/all", "data": {"title": "$title", "message": "$message", "bigText": "$bigText"}}';
+    String json =
+        '{"to": "/topics/all", "data": {"title": "$title", "message": "$message", "bigText": "$bigText"}}';
     http.Response response =
         await http.post(endUrl, headers: headers, body: json);
 

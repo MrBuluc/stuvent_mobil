@@ -1,16 +1,17 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
+import 'package:rxdart/subjects.dart';
 import 'package:stuventmobil/common_widget/platform_duyarli_alert_dialog.dart';
 import 'package:stuventmobil/ui/event_details/event_details_page.dart';
+
 import 'model/event.dart';
-import 'package:rxdart/subjects.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -140,6 +141,7 @@ class NotificationHandler {
       Map<String, dynamic> data = gelenBildirim["data"];
       if (data.containsKey("image-url")) {
         List<dynamic> categoryIds = [0];
+        List<dynamic> participants = [""];
         Map<String, dynamic> documentsMap = {};
 
         try {
@@ -148,7 +150,8 @@ class NotificationHandler {
               location: data["message"],
               categoryIds: categoryIds,
               imageURL: data["image-url"],
-              documentsMap: documentsMap);
+              documentsMap: documentsMap,
+              participants: participants);
           print("Event: $event");
 
           Navigator.push(

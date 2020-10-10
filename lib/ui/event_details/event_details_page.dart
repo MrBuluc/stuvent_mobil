@@ -2,15 +2,17 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_document_picker/flutter_document_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:stuventmobil/common_widget/platform_duyarli_alert_dialog.dart';
 import 'package:stuventmobil/model/userC.dart';
-import 'package:stuventmobil/viewmodel/user_model.dart';
-import '../../model/event.dart';
 import 'package:stuventmobil/ui/QrCode/generate.dart';
 import 'package:stuventmobil/ui/QrCode/scan.dart';
-import 'package:flutter_document_picker/flutter_document_picker.dart';
+import 'package:stuventmobil/ui/event_details/participants_page.dart';
+import 'package:stuventmobil/viewmodel/user_model.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../model/event.dart';
 
 class EventDetailsPage extends StatefulWidget {
   final Event event;
@@ -135,6 +137,23 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                       child: const Text('QR oluştur')),
                 ),
             ]),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              child: RaisedButton(
+                  color: Color(0xFFFF4700),
+                  textColor: Colors.white,
+                  splashColor: Colors.blueGrey,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ParticipantsPage(
+                                participants: widget.event.participants,
+                              )),
+                    );
+                  },
+                  child: const Text('Yoklamayı Görüntüle')),
+            ),
             if (superU)
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
