@@ -6,11 +6,10 @@ import 'package:stuventmobil/model/category.dart';
 import 'package:stuventmobil/model/event.dart';
 import 'package:stuventmobil/notification_handler.dart';
 import 'package:stuventmobil/styleguide.dart';
+import 'package:stuventmobil/ui/Profil/profil.dart';
 import 'package:stuventmobil/ui/event_details/event_details_page.dart';
 import 'package:stuventmobil/ui/homepage/event_widget.dart';
 import 'package:stuventmobil/ui/homepage/home_page_background.dart';
-
-import 'file:///C:/Users/HAKKICAN/AndroidStudioProjects/stuvent_mobil/lib/ui/Profil/profil.dart';
 
 import 'category_widget.dart';
 

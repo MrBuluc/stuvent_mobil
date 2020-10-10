@@ -25,6 +25,11 @@ class _EventWidgetState extends State<EventWidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            Center(
+                child: Text(
+              widget.event.title,
+              style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
+            )),
             ClipRRect(
               borderRadius: BorderRadius.all(
                 Radius.circular(30.0),
