@@ -148,7 +148,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => ParticipantsPage(
-                                participants: widget.event.participants,
+                                eventName: widget.event.title,
                               )),
                     );
                   },

@@ -1,24 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:stuventmobil/viewmodel/user_model.dart';
 
 class ParticipantsPage extends StatefulWidget {
-  List<dynamic> participants;
+  String eventName;
 
-  ParticipantsPage({@required this.participants});
+  ParticipantsPage({@required this.eventName});
 
   @override
   _ParticipantsPageState createState() => _ParticipantsPageState();
 }
 
 class _ParticipantsPageState extends State<ParticipantsPage> {
-  List<String> list = [];
+  List<dynamic> participants = [];
+
   @override
   Widget build(BuildContext context) {
+    UserModel _userModel = Provider.of<UserModel>(context);
+    readParticipants(_userModel, widget.eventName);
     return Scaffold(
       appBar: AppBar(
         title: Text("Katılımcılar Listesi"),
         backgroundColor: Color(0xFFFF4700),
       ),
-      body: widget.participants.isEmpty
+      body: participants.length == 0
           ? Container(
               child: Center(
                 child: Column(
@@ -39,16 +44,30 @@ class _ParticipantsPageState extends State<ParticipantsPage> {
               ),
             )
           : ListView(
-              children: widget.participants
-                  .map((index) => Padding(
+              children: participants
+                  .map((participant) => Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          index,
-                          style: TextStyle(fontSize: 20),
+                        child: ListTile(
+                          leading: Text(
+                            (participants.indexOf(participant) + 1).toString(),
+                            style: TextStyle(fontSize: 20),
+                          ),
+                          title: Text(
+                            participant,
+                            style: TextStyle(fontSize: 20),
+                          ),
                         ),
                       ))
                   .toList(),
             ),
     );
+  }
+
+  Future<void> readParticipants(UserModel userModel, String eventName) async {
+    try {
+      participants = await userModel.readParticipants(eventName);
+    } catch (e) {
+      print("readParticipants hata: " + e.toString());
+    }
   }
 }

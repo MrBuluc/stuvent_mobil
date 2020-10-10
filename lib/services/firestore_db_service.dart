@@ -74,6 +74,17 @@ class FirestoreDBService implements DBBase {
   }
 
   @override
+  Future<List<dynamic>> readParticipants(String eventName) async {
+    DocumentSnapshot docSnapshot =
+        await _firebaseDB.collection("Etkinlikler").doc(eventName).get();
+
+    Map<String, dynamic> data = docSnapshot.data();
+    List<dynamic> participants = data["Katilimcilar"];
+
+    return participants;
+  }
+
+  @override
   Future<bool> yoklamaAl(String userName, String userID, String eventName) {
     try {
       DocumentReference eventRef = _firebaseDB.doc("Users/$userID");

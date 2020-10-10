@@ -100,6 +100,10 @@ class UserRepository implements AuthBase {
     return await _firestoreDBService.getEtkinlikler();
   }
 
+  Future<List<dynamic>> readParticipants(String eventName) async {
+    return await _firestoreDBService.readParticipants(eventName);
+  }
+
   Future<bool> sendPasswordResetEmail(String mail) async {
     return await _firebaseAuthService.sendPasswordResetEmail(mail);
   }

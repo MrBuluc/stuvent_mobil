@@ -153,6 +153,17 @@ class UserModel with ChangeNotifier implements AuthBase {
     }
   }
 
+  Future<List<dynamic>> readParticipants(String eventName) async {
+    try {
+      List<dynamic> participants =
+          await _userRepository.readParticipants(eventName);
+      return participants;
+    } catch (e) {
+      print("user_model hata: " + e.toString());
+      return null;
+    }
+  }
+
   Future<bool> sendPasswordResetEmail(String mail) async {
     try {
       bool sonuc = await _userRepository.sendPasswordResetEmail(mail);
