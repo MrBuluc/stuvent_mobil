@@ -25,7 +25,8 @@ class UserModel with ChangeNotifier implements AuthBase {
   }
 
   UserModel() {
-    currentUser();
+    state = ViewState.Busy;
+    currentUser().then((user) => state = ViewState.Idle);
   }
 
   @override

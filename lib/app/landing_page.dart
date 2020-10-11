@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import "package:stuventmobil/ui/homepage/home_page.dart";
-import 'package:stuventmobil/ui/Login/login.dart';
-import 'package:stuventmobil/viewmodel/user_model.dart';
 import 'package:provider/provider.dart';
+import 'package:stuventmobil/common_widget/merkez_widget.dart';
+import 'package:stuventmobil/ui/Login/login.dart';
+import "package:stuventmobil/ui/homepage/home_page.dart";
+import 'package:stuventmobil/viewmodel/user_model.dart';
 
 class LandingPage extends StatelessWidget {
   @override
@@ -18,8 +19,29 @@ class LandingPage extends StatelessWidget {
       }
     } else {
       return Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
+        backgroundColor: Color(0xff84b7f1),
+        body: MerkezWidget(
+          children: [
+            Image.asset(
+              "assets/icon.png",
+              height: 100,
+              width: 100,
+            ),
+            SizedBox(
+              height: 8,
+            ),
+            Text(
+              "Stuvent'a Hoşgeldiniz",
+              style: TextStyle(fontSize: 20),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            CircularProgressIndicator(
+              backgroundColor: Colors.white,
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xfff1c984)),
+            )
+          ],
         ),
       );
     }

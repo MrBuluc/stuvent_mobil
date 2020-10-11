@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:stuventmobil/common_widget/merkez_widget.dart';
 import 'package:stuventmobil/viewmodel/user_model.dart';
 
 class ParticipantsPage extends StatefulWidget {
@@ -24,24 +25,18 @@ class _ParticipantsPageState extends State<ParticipantsPage> {
         backgroundColor: Color(0xFFFF4700),
       ),
       body: participants.length == 0
-          ? Container(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.account_circle,
-                      size: 120,
-                    ),
-                    Text(
-                      "Henüz Yoklama Yapılmamıştır",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 36),
-                    )
-                  ],
+          ? MerkezWidget(
+              children: [
+                Icon(
+                  Icons.account_circle,
+                  size: 120,
                 ),
-              ),
+                Text(
+                  "Henüz Yoklama Yapılmamıştır",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 36),
+                )
+              ],
             )
           : ListView(
               children: participants
