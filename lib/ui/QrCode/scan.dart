@@ -77,33 +77,34 @@ class _ScanState extends State<ScanScreen> {
 
     String userName = userModel.user.userName + " " + userModel.user.lastName;
     try {
-      setState(() async {
-        bool sonuc =
-            await userModel.yoklamaAl(userName, userModel.user.userID, barcode);
-        if (sonuc == true || sonuc == null) {
-          PlatformDuyarliAlertDialog(
-            baslik: "Yoklama Alındı",
-            icerik: "Yoklama başarılı bir şekilde alındı",
-            anaButonYazisi: "Tamam",
-          ).goster(context);
-          setState(() {
-            result = "Yoklama Alındı";
-          });
-        } else {
-          PlatformDuyarliAlertDialog(
-            baslik: "Yoklama Alınamadı :(",
-            icerik: "Yoklama alınırken bir sorun oluştu.\n" +
-                "İnternet bağlantınızı kontrol edin.",
-            anaButonYazisi: "Tamam",
-          ).goster(context);
-        }
-      });
+      bool sonuc = await userModel.yoklamaAl(
+          userName, userModel.user.userID, "CS Toplantısı");
+      if (sonuc == true || sonuc == null) {
+        PlatformDuyarliAlertDialog(
+          baslik: "Yoklama Alındı",
+          icerik: "Yoklama başarılı bir şekilde alındı",
+          anaButonYazisi: "Tamam",
+        ).goster(context);
+        setState(() {
+          result = "Yoklama Alındı";
+        });
+      } else {
+        PlatformDuyarliAlertDialog(
+          baslik: "Yoklama Alınamadı 😞",
+          icerik: "Yoklama alınırken bir sorun oluştu.\n" +
+              "İnternet bağlantınızı kontrol edin.",
+          anaButonYazisi: "Tamam",
+        ).goster(context);
+      }
     } on PlatformException catch (e) {
       PlatformDuyarliAlertDialog(
         baslik: "Yoklama Alma HATA",
         icerik: Exceptions.goster(e.code),
         anaButonYazisi: 'Tamam',
       ).goster(context);
+      setState(() {
+        result = "Yoklama Alma HATA";
+      });
     }
   }
 

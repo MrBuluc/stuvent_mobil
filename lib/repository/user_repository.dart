@@ -110,7 +110,7 @@ class UserRepository implements AuthBase {
 
   Future<bool> yoklamaAl(
       String userName, String userID, String eventName) async {
-    return _firestoreDBService.yoklamaAl(userName, userID, eventName);
+    return await _firestoreDBService.yoklamaAl(userName, userID, eventName);
   }
 
   Future<bool> updatePassword(String password) async {

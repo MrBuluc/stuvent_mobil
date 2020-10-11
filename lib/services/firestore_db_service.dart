@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:stuventmobil/model/userC.dart';
 import 'package:stuventmobil/services/database_base.dart';
@@ -86,33 +88,36 @@ class FirestoreDBService implements DBBase {
 
   @override
   Future<bool> yoklamaAl(String userName, String userID, String eventName) {
-    try {
-      DocumentReference eventRef = _firebaseDB.doc("Users/$userID");
+    DocumentReference eventRef = _firebaseDB.doc("Users/$userID");
 
-      List etkinlik;
-      _firebaseDB.runTransaction((Transaction transaction) async {
-        DocumentSnapshot eventData = await eventRef.get();
-        Map<String, dynamic> data = eventData.data();
-        etkinlik = data["Etkinlikler"];
+    List etkinlik;
+    _firebaseDB.runTransaction((Transaction transaction) async {
+      DocumentSnapshot eventData = await eventRef.get();
+      Map<String, dynamic> data = eventData.data();
+      etkinlik = data["Etkinlikler"];
+      if (!etkinlik.contains(eventName)) {
         etkinlik.add(eventName);
         transaction.update(eventRef, {"Etkinlikler": etkinlik});
-      });
+      } else {
+        return Future.value(false);
+      }
+    });
 
-      DocumentReference eventRef1 = _firebaseDB.doc("Etkinlikler/$eventName");
+    DocumentReference eventRef1 = _firebaseDB.doc("Etkinlikler/$eventName");
 
-      List katilimcilar;
-      _firebaseDB.runTransaction((Transaction transaction) async {
-        DocumentSnapshot eventRefData = await eventRef1.get();
-        Map<String, dynamic> data = eventRefData.data();
-        katilimcilar = data["Katilimcilar"];
+    List katilimcilar;
+    _firebaseDB.runTransaction((Transaction transaction) async {
+      DocumentSnapshot eventRefData = await eventRef1.get();
+      Map<String, dynamic> data = eventRefData.data();
+      katilimcilar = data["Katilimcilar"];
+      if (!katilimcilar.contains(userName)) {
         katilimcilar.add(userName);
         transaction.update(eventRef1, {"Katilimcilar": katilimcilar});
-      });
-      return Future.value(true);
-    } catch (e) {
-      print(e);
-      return Future.value(false);
-    }
+        return Future.value(true);
+      } else {
+        return Future.value(false);
+      }
+    });
   }
 
   @override
