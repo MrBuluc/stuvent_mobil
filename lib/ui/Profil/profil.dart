@@ -7,6 +7,7 @@ import 'package:stuventmobil/ui/Generate_Event/GeneratEvent.dart';
 import 'package:stuventmobil/ui/Generate_Notification/GenerateNotification.dart';
 import 'package:stuventmobil/ui/Profil/update_password_page.dart';
 import 'package:stuventmobil/viewmodel/user_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Profil extends StatefulWidget {
   @override
@@ -17,9 +18,11 @@ class _ProfilState extends State<Profil> {
   final formKey = GlobalKey<FormState>();
 
   String name = "", mail = "", password;
-  String result = "";
   bool superU = false;
   bool otomatikKontrol = false;
+
+  String hBLinkedin =
+      "https://www.linkedin.com/in/hakk%C4%B1can-b%C3%BCl%C3%BC%C3%A7-967383199/";
 
   @override
   void dispose() {
@@ -84,7 +87,7 @@ class _ProfilState extends State<Profil> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                        builder: (context) => UpdatePasswordPage()));
+                            builder: (context) => UpdatePasswordPage()));
                   },
                   color: Colors.pink,
                 ),
@@ -139,16 +142,42 @@ class _ProfilState extends State<Profil> {
                   color: Colors.red,
                 ),
                 SizedBox(
-                  height: 10,
+                  height: 90,
                 ),
                 Padding(
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                  child: Text(
-                    result,
-                    textAlign: TextAlign.center,
-                  ),
-                )
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    child: Column(
+                      children: [
+                        Text("© 2020 IEEE MSKU - Tüm Hakları Sakldır."),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Created by ",
+                              textAlign: TextAlign.center,
+                            ),
+                            GestureDetector(
+                              onTap: () async {
+                                if (await canLaunch(hBLinkedin)) {
+                                  await launch(hBLinkedin);
+                                } else {
+                                  debugPrint("Could not launch: $hBLinkedin");
+                                }
+                              },
+                              child: Text(
+                                "Mr. Bülüç",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.center,
+                              ),
+                            )
+                          ],
+                        ),
+                      ],
+                    ))
               ],
             ),
           ),
@@ -173,7 +202,7 @@ class _ProfilState extends State<Profil> {
       await userModel.signOut();
 
       final sonuc = await PlatformDuyarliAlertDialog(
-        baslik: "Oturumunuz Kapatıldı :(",
+        baslik: "Oturumunuz Kapatıldı 😞",
         icerik: "Oturumunuz başarıyla kapatıldı\n" + "Yine Bekleriz...",
         anaButonYazisi: "Tamam",
       ).goster(context);
