@@ -21,8 +21,7 @@ class _ProfilState extends State<Profil> {
   bool superU = false;
   bool otomatikKontrol = false;
 
-  String hBLinkedin =
-      "https://www.linkedin.com/in/hakk%C4%B1can-b%C3%BCl%C3%BC%C3%A7-967383199/";
+  String hBLinkedin = "https://www.linkedin.com/in/hakkican-buluc/";
 
   @override
   void dispose() {
