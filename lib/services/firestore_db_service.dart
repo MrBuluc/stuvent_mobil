@@ -19,18 +19,21 @@ class FirestoreDBService implements DBBase {
   }
 
   @override
-  Future<bool> update(
-      String collection, String documentName, String alan, dynamic newData) {
-    _firebaseDB
-        .collection(collection)
-        .doc(documentName)
-        .update({alan: newData}).then((value) {
+  Future<bool> update(String collection, String documentName, String alan,
+      dynamic newData) async {
+    try {
+      await _firebaseDB
+          .collection(collection)
+          .doc(documentName)
+          .update({alan: newData}).catchError((onError) {
+        print("db_service update hata: " + onError.toString());
+        return false;
+      });
       return true;
-    }).catchError((onError) {
-      print("db_service update hata: " + onError.toString());
+    } catch (e) {
+      print("db_service update catch hata: " + e.toString());
       return false;
-    });
-    return Future.value(false);
+    }
   }
 
   @override

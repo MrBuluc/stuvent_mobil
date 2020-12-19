@@ -28,7 +28,7 @@ dependencies:
   firebase_auth: 0.18.0+1
   google_sign_in: 4.5.4
   flutter_document_picker: 4.0.0
-  url_launcher: 5.7.2
+  url_launcher: 5.7.10
   get_it: 5.0.1
   firebase_messaging: 7.0.0
   flutter_local_notifications: 1.4.4+4

@@ -219,34 +219,34 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
 
       docMap[fileName] = url;
 
-      await userModel
+      bool sonuc = await userModel
           .update("Etkinlikler", widget.event.title, "Dosyalar", docMap)
-          .then((sonuc) {
-        if (sonuc == true || sonuc == null) {
-          PlatformDuyarliAlertDialog(
-            baslik: "Dosya Eklendi",
-            icerik: "Dosya başarılı bir şekilde eklendi",
-            anaButonYazisi: "Tamam",
-          ).goster(context);
-
-          setState(() {
-            control = false;
-            docMapKeys = docMap.keys.toList();
-          });
-        } else {
-          PlatformDuyarliAlertDialog(
-            baslik: "Dosyalar Güncellenemedi",
-            icerik: "Dosya güncellenirken hata oluştu",
-            anaButonYazisi: "Tamam",
-          ).goster(context);
-        }
-      }).catchError((onError) {
+          .catchError((onError) {
         PlatformDuyarliAlertDialog(
           baslik: "Dosyalar Güncellenemedi",
           icerik: "Dosya güncellenirken hata oluştu\n" + onError.toString(),
           anaButonYazisi: "Tamam",
         ).goster(context);
       });
+      if (sonuc || sonuc == null) {
+        PlatformDuyarliAlertDialog(
+          baslik: "Dosya Eklendi",
+          icerik: "Dosya başarılı bir şekilde eklendi",
+          anaButonYazisi: "Tamam",
+        ).goster(context);
+
+        setState(() {
+          control = false;
+          docMapKeys = docMap.keys.toList();
+        });
+      } else {
+        PlatformDuyarliAlertDialog(
+          baslik: "Dosyalar Güncellenemedi",
+          icerik: "Dosya güncellenirken hata oluştu",
+          anaButonYazisi: "Tamam",
+        ).goster(context);
+        print("sonuc: " + sonuc.toString());
+      }
     } catch (e) {
       PlatformDuyarliAlertDialog(
         baslik: "Dosyalar Güncellenemedi",
